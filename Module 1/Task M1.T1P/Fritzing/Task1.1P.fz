@@ -1708,7 +1708,7 @@
             <title>Wire163</title>
             <views>
                 <schematicView layer="schematicTrace">
-                    <geometry z="5.50014" x="9.04459" y="206.846" x1="0" y1="0" x2="53.8743" y2="0" wireFlags="160"/>
+                    <geometry z="5.50014" x="9.04459" y="206.846" x1="0" y1="0" x2="53.8743" y2="-0.0002" wireFlags="160"/>
                     <wireExtras mils="9.7222" color="#404040" opacity="1" banded="0"/>
                     <connectors>
                         <connector connectorId="connector0" layer="schematicTrace">
@@ -1767,7 +1767,7 @@
             <title>Wire164</title>
             <views>
                 <schematicView layer="schematicTrace">
-                    <geometry z="5.50015" x="62.9189" y="206.846" x1="0" y1="0" x2="0" y2="-44.8297" wireFlags="160"/>
+                    <geometry z="5.50015" x="62.9189" y="206.846" x1="0" y1="0" x2="0.207579" y2="-53.9663" wireFlags="160"/>
                     <wireExtras mils="9.7222" color="#404040" opacity="1" banded="0"/>
                     <connectors>
                         <connector connectorId="connector0" layer="schematicTrace">
@@ -1826,7 +1826,7 @@
             <title>Wire165</title>
             <views>
                 <schematicView layer="schematicTrace">
-                    <geometry z="5.50016" x="62.9189" y="162.016" x1="0" y1="0" x2="0.081106" y2="-9.01625" wireFlags="160"/>
+                    <geometry z="5.50016" x="63.1265" y="152.88" x1="0" y1="0" x2="-0.126469" y2="0.120159" wireFlags="160"/>
                     <wireExtras mils="9.7222" color="#404040" opacity="1" banded="0"/>
                     <connectors>
                         <connector connectorId="connector0" layer="schematicTrace">
