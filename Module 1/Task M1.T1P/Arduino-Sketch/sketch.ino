@@ -16,7 +16,7 @@ void setup()
 void loop()
 {
   bool motionDetected = false;
-  if (digitalRead(Pin::PIR) == 1) motionDetected = true;
+  if (1 == digitalRead(Pin::PIR)) motionDetected = true;
   
   Serial.print(motionDetected);
 
