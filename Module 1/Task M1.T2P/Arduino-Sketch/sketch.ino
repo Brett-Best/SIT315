@@ -5,22 +5,26 @@ enum Pin {
   PIR = 2
 };
 
+bool motionDetected = false;
+
 void setup()
 {
   Serial.begin(sBaudRate);
 
   pinMode(Pin::LED, OUTPUT);
   pinMode(Pin::PIR, INPUT);
+
+  attachInterrupt(digitalPinToInterrupt(Pin::PIR), toggleLED, CHANGE);
 }
 
 void loop()
 {
-  bool motionDetected = false;
-  if (1 == digitalRead(Pin::PIR)) motionDetected = true;
+}
+
+void toggleLED() {
+  motionDetected = !motionDetected;
   
   Serial.print(motionDetected);
 
   digitalWrite(Pin::LED, motionDetected ? HIGH : LOW);
-
-  delay(500);
 }
