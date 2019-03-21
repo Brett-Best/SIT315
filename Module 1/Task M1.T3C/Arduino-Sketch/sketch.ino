@@ -13,9 +13,6 @@ void setup()
 {
   Serial.begin(sBaudRate);
 
-  pinMode(4, OUTPUT);
-  digitalWrite(4, LOW);
-
   pinMode(Pin::LED_RED, OUTPUT);
   pinMode(Pin::LED_BLUE, OUTPUT);
   pinMode(Pin::PIR1, INPUT);
@@ -42,8 +39,6 @@ void toggleLED(int ledId) {
   
   Serial.print("Led: ");
   Serial.print(0 == ledId ? "Red" : "Blue");
-  Serial.print(", Digital Read: ");
-  Serial.print(digitalRead(LED));
   Serial.print(", Motion Detected: ");
   Serial.println(motionDetected[ledId]);
 
