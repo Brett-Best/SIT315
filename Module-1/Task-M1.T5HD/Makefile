@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = arduino_hello-world
+APPLICATION = arduino_PIR-RIOT
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -8,6 +8,7 @@ BOARD ?= native
 RIOTBASE ?= $(HOME)/SIT315_RIOT
 
 USEMODULE += arduino
+USEMODULE += periph_gpio_irq
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

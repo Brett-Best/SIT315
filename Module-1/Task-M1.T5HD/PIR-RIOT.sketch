@@ -1,7 +1,5 @@
 #include "arduino.hpp"
 #include "board.h"
-#include "arduino.hpp"
-#include "board.h"
 
 static const int sBaudRate = 9600;
 
@@ -46,16 +44,4 @@ void toggleLED(void *arg) {
   int state = motionDetected ? HIGH : LOW;
   digitalWrite(Pin::LED1, state);
   digitalWrite(Pin::LED2, state);
-}
-
-int main(void)
-{
-    /* run the Arduino setup */
-    setup();
-    /* and the event loop */
-    while (1) {
-        loop();
-    }
-    /* never reached */
-    return 0;
 }
