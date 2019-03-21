@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"riot.board": "arduino-uno",
+		"riot.build_dir": ".",
+		"riot.quiet": "QUIET=1",
+		"arduino.defaultBaudRate": 9600
+	}
+}

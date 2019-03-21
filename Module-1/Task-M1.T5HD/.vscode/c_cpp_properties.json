@@ -1,0 +1,90 @@
+{
+    "configurations": [
+        {
+            "includePath": [
+                "/usr/local/include",
+                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/include",
+                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
+                "/usr/include",
+                "/Users/brettbest/SIT315_RIOT/boards/arduino-uno/include",
+                "/Users/brettbest/SIT315_RIOT/boards/common/arduino-atmega/include",
+                "/Users/brettbest/SIT315_RIOT/boards/common/atmega/include",
+                "/Users/brettbest/SIT315_RIOT/core/include",
+                "/Users/brettbest/SIT315_RIOT/cpu/atmega328p/include",
+                "/Users/brettbest/SIT315_RIOT/cpu/atmega_common/include",
+                "/Users/brettbest/SIT315_RIOT/drivers/include",
+                "/Users/brettbest/SIT315_RIOT/sys/arduino/include",
+                "/Users/brettbest/SIT315_RIOT/sys/include",
+                "/Users/brettbest/SIT315_RIOT/sys/libc/include"
+            ],
+            "defines": [
+                "__GNUC__",
+                "DEVELHELP=1",
+                "RIOT_APPLICATION=\"arduino_hello-world\"",
+                "BOARD_ARDUINO_UNO=\"arduino-uno\"",
+                "RIOT_BOARD=BOARD_ARDUINO_UNO",
+                "CPU_ATMEGA328P=\"atmega328p\"",
+                "RIOT_CPU=CPU_ATMEGA328P",
+                "MCU_ATMEGA328P=\"atmega328p\"",
+                "RIOT_MCU=MCU_ATMEGA328P",
+                "MODULE_ARDUINO=1",
+                "MODULE_ATMEGA_COMMON=1",
+                "MODULE_ATMEGA_COMMON_PERIPH=1",
+                "MODULE_AUTO_INIT=1",
+                "MODULE_AVR_LIBC_EXTRA=1",
+                "MODULE_BOARD=1",
+                "MODULE_BOARDS_COMMON_ARDUINO_ATMEGA=1",
+                "MODULE_BOARDS_COMMON_ATMEGA=1",
+                "MODULE_CORE=1",
+                "MODULE_CORE_MSG=1",
+                "MODULE_CPU=1",
+                "MODULE_DIV=1",
+                "MODULE_ISRPIPE=1",
+                "MODULE_PERIPH_COMMON=1",
+                "MODULE_PERIPH_GPIO=1",
+                "MODULE_PERIPH_PM=1",
+                "MODULE_PERIPH_TIMER=1",
+                "MODULE_PERIPH_UART=1",
+                "MODULE_STDIO_UART=1",
+                "MODULE_SYS=1",
+                "MODULE_TSRB=1",
+                "MODULE_XTIMER=1",
+                "RIOT_VERSION=\"2019.04-devel-586-gc391ed\""
+            ],
+            "name": "darwin",
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "/usr/local/include",
+                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/include",
+                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
+                    "/usr/include",
+                    "/Users/brettbest/SIT315_RIOT/boards/arduino-uno/include",
+                    "/Users/brettbest/SIT315_RIOT/boards/common/arduino-atmega/include",
+                    "/Users/brettbest/SIT315_RIOT/boards/common/atmega/include",
+                    "/Users/brettbest/SIT315_RIOT/core/include",
+                    "/Users/brettbest/SIT315_RIOT/cpu/atmega328p/include",
+                    "/Users/brettbest/SIT315_RIOT/cpu/atmega_common/include",
+                    "/Users/brettbest/SIT315_RIOT/drivers/include",
+                    "/Users/brettbest/SIT315_RIOT/sys/arduino/include",
+                    "/Users/brettbest/SIT315_RIOT/sys/include",
+                    "/Users/brettbest/SIT315_RIOT/sys/libc/include"
+                ]
+            },
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        },
+        {
+            "name": "Mac",
+            "includePath": [
+                "/Users/brettbest/Library/Arduino15/packages/arduino/tools/**",
+                "/Users/brettbest/Library/Arduino15/packages/arduino/hardware/avr/1.6.23/**"
+            ],
+            "forcedInclude": [
+                "/Users/brettbest/Library/Arduino15/packages/arduino/hardware/avr/1.6.23/cores/arduino/Arduino.h"
+            ]
+        }
+    ],
+    "version": 4
+}
