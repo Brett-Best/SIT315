@@ -20,6 +20,14 @@ void setup()
 
   attachInterrupt(digitalPinToInterrupt(Pin::PIR1), toggleLED_RED, CHANGE);
   attachInterrupt(digitalPinToInterrupt(Pin::PIR2), toggleLED_BLUE, CHANGE);
+
+  motionDetected[0] = digitalRead(Pin::PIR1);
+  motionDetected[1] = digitalRead(Pin::PIR2);
+
+  if (true == motionDetected[0]) { Serial.println("Led: Red, motion detected previously."); }
+  if (true == motionDetected[1]) { Serial.println("Led: Blue, motion detected previously."); }
+
+  updateLEDs();
 }
 
 void loop() {}
@@ -33,8 +41,6 @@ void toggleLED_BLUE() {
 }
 
 void toggleLED(int ledId) {
-  int LED = 0 == ledId ? Pin::LED_RED : Pin::LED_BLUE;
-  
   motionDetected[ledId] = !motionDetected[ledId];
   
   Serial.print("Led: ");
@@ -42,5 +48,10 @@ void toggleLED(int ledId) {
   Serial.print(", Motion Detected: ");
   Serial.println(motionDetected[ledId]);
 
-  digitalWrite(LED, motionDetected[ledId] ? HIGH : LOW);
+  updateLEDs();
+}
+
+void updateLEDs() {
+  digitalWrite(Pin::LED_RED, motionDetected[0] ? HIGH : LOW);
+  digitalWrite(Pin::LED_BLUE, motionDetected[1] ? HIGH : LOW);
 }
