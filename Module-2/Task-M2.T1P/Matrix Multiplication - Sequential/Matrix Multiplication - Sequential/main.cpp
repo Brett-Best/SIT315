@@ -45,8 +45,6 @@ void multiplyMatrices() {
       }
     }
   }
-  
-  return;
 }
 
 void writeMatriceToDisk(string name, matrix matrice[MATRIX_SIZE][MATRIX_SIZE], ofstream *outputFileStream) {
