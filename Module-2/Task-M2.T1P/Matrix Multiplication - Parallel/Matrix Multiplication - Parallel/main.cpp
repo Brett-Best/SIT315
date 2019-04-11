@@ -38,8 +38,14 @@ void generateMatrices() {
 void multiplyMatrices(int threadId) {
   int row, column, offset;
   
-  int chunkSize = MATRIX_SIZE / THREADS_TO_USE;
+  int chunkSize = max(MATRIX_SIZE / THREADS_TO_USE, 1);
   int from = chunkSize * threadId;
+  
+  if (from > MATRIX_SIZE - 1) {
+    printf("Thread ID: %i, unneeded.\n", threadId);
+    return;
+  }
+  
   int to = (threadId + 1) == THREADS_TO_USE ? MATRIX_SIZE : chunkSize * (threadId + 1);
   
   printf("Thread ID: %i, From: %i, To: %i\n", threadId, from, to-1);
