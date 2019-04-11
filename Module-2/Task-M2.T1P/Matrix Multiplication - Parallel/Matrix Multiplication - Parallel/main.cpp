@@ -16,13 +16,13 @@ using namespace std;
 #define MATRIX_SIZE 2'000
 #define MAX_VALUE 1'000'000UL
 #define matrix unsigned long long
+#define THREADS_TO_USE 8
 
 matrix matrixA[MATRIX_SIZE][MATRIX_SIZE];
 matrix matrixB[MATRIX_SIZE][MATRIX_SIZE];
 matrix matrixC[MATRIX_SIZE][MATRIX_SIZE];
 
-clock_t t_start;
-clock_t t_end;
+struct timespec startTimespec, endTimespec;
 
 void generateMatrices() {
   int row, column;
@@ -35,10 +35,16 @@ void generateMatrices() {
   }
 }
 
-void multiplyMatrices() {
+void multiplyMatrices(int threadId) {
   int row, column, offset;
   
-  for (row = 0; row < MATRIX_SIZE; row++) {
+  int chunkSize = MATRIX_SIZE / THREADS_TO_USE;
+  int from = chunkSize * threadId;
+  int to = (threadId + 1) == THREADS_TO_USE ? MATRIX_SIZE : chunkSize * (threadId + 1);
+  
+  printf("Thread ID: %i, From: %i, To: %i\n", threadId, from, to-1);
+  
+  for (row = from; row < to; row++) {
     for (column = 0; column < MATRIX_SIZE; column++) {
       for (offset = 0; offset < MATRIX_SIZE; offset++) {
         matrixC[row][column] += matrixA[row][offset] * matrixB[offset][column];
@@ -70,7 +76,7 @@ void writeMatriceToDisk(string name, matrix matrice[MATRIX_SIZE][MATRIX_SIZE], o
 }
 
 void writeMatricesToDisk() {
-  ofstream outputFileStream("MM-Sequential.txt");
+  ofstream outputFileStream("MM-Parallel.txt");
   
   if (outputFileStream.is_open()) {
     writeMatriceToDisk("A", matrixA, &outputFileStream);
@@ -85,22 +91,27 @@ void writeMatricesToDisk() {
 
 void printThreadInfo() {
   unsigned int hardwareConcurrency = thread::hardware_concurrency();
-  cout << "Number of cores: " << hardwareConcurrency << endl;;
+  cout << "Number of cores: " << hardwareConcurrency << endl;
 }
 
 void startTimer() {
-  t_start = clock();
+  clock_gettime(CLOCK_MONOTONIC, &startTimespec);
 }
 
 void stopTimer() {
-  t_end = clock();
+  clock_gettime(CLOCK_MONOTONIC, &endTimespec);
 }
 
 double durationBetweenTimers() {
-  return ((double)(t_end - t_start)) / CLOCKS_PER_SEC;
+  double seconds = (endTimespec.tv_sec - startTimespec.tv_sec);
+  seconds += (endTimespec.tv_nsec - startTimespec.tv_nsec) / 1000000000.0;
+  
+  return seconds;
 }
 
 int main(int argc, const char * argv[]) {
+  srand((int)time(NULL));
+  
   printThreadInfo();
   
   startTimer();
@@ -113,7 +124,15 @@ int main(int argc, const char * argv[]) {
   
   startTimer();
   
-  multiplyMatrices();
+  thread threads[THREADS_TO_USE];
+  
+  for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
+    threads[threadId] = thread(multiplyMatrices, threadId);
+  }
+  
+  for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
+    threads[threadId].join();
+  }
   
   stopTimer();
   

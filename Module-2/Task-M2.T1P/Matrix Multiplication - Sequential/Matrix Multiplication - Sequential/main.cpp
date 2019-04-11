@@ -101,6 +101,8 @@ double durationBetweenTimers() {
 }
 
 int main(int argc, const char * argv[]) {
+  srand((int)time(NULL));
+  
   printThreadInfo();
   
   startTimer();
