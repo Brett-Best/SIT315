@@ -7,9 +7,12 @@
 //
 
 #include <iostream>
+#include "omp.h"
+
+using namespace std;
 
 int main(int argc, const char * argv[]) {
-  // insert code here...
-  std::cout << "Hello, World!\n";
+#pragma omp parallel
+  cout << "Greetings from thread " << omp_get_thread_num() << endl;
   return 0;
 }
