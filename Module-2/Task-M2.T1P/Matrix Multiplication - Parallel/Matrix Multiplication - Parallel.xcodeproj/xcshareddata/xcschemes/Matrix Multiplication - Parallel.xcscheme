@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0B1F4A84225BB2BE004B6293"
-               BuildableName = "Matrix Multiplication - Sequential"
-               BlueprintName = "Matrix Multiplication - Sequential"
-               ReferencedContainer = "container:Matrix Multiplication - Sequential.xcodeproj">
+               BlueprintIdentifier = "0B1F4A97225BB2F6004B6293"
+               BuildableName = "Matrix Multiplication - Parallel"
+               BlueprintName = "Matrix Multiplication - Parallel"
+               ReferencedContainer = "container:Matrix Multiplication - Parallel.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0B1F4A84225BB2BE004B6293"
-            BuildableName = "Matrix Multiplication - Sequential"
-            BlueprintName = "Matrix Multiplication - Sequential"
-            ReferencedContainer = "container:Matrix Multiplication - Sequential.xcodeproj">
+            BlueprintIdentifier = "0B1F4A97225BB2F6004B6293"
+            BuildableName = "Matrix Multiplication - Parallel"
+            BlueprintName = "Matrix Multiplication - Parallel"
+            ReferencedContainer = "container:Matrix Multiplication - Parallel.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -45,7 +45,8 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      disableMainThreadChecker = "YES"
+      enableThreadSanitizer = "YES"
+      enableUBSanitizer = "YES"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
@@ -56,10 +57,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0B1F4A84225BB2BE004B6293"
-            BuildableName = "Matrix Multiplication - Sequential"
-            BlueprintName = "Matrix Multiplication - Sequential"
-            ReferencedContainer = "container:Matrix Multiplication - Sequential.xcodeproj">
+            BlueprintIdentifier = "0B1F4A97225BB2F6004B6293"
+            BuildableName = "Matrix Multiplication - Parallel"
+            BlueprintName = "Matrix Multiplication - Parallel"
+            ReferencedContainer = "container:Matrix Multiplication - Parallel.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -75,10 +76,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0B1F4A84225BB2BE004B6293"
-            BuildableName = "Matrix Multiplication - Sequential"
-            BlueprintName = "Matrix Multiplication - Sequential"
-            ReferencedContainer = "container:Matrix Multiplication - Sequential.xcodeproj">
+            BlueprintIdentifier = "0B1F4A97225BB2F6004B6293"
+            BuildableName = "Matrix Multiplication - Parallel"
+            BlueprintName = "Matrix Multiplication - Parallel"
+            ReferencedContainer = "container:Matrix Multiplication - Parallel.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
