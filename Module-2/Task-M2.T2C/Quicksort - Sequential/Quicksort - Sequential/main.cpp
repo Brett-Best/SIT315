@@ -67,7 +67,7 @@ vector<int> randomIntVector(int length) {
 int main(int argc, const char * argv[]) {
   startTimer();
   
-  vector<int> v = randomIntVector(100000000);
+  vector<int> v = randomIntVector(10000);
   
   stopTimer();
   
@@ -75,7 +75,9 @@ int main(int argc, const char * argv[]) {
   
   startTimer();
   
-  vector<int> vSorted = quicksort(v);
+  for (int iteration = 1; iteration <= 10; iteration++) {
+    vector<int> vSorted = quicksort(v);
+  }
   
   stopTimer();
   
