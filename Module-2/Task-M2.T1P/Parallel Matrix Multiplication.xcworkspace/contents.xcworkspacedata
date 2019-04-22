@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:build.sh">
+   </FileRef>
+   <FileRef
+      location = "group:Matrix Multiplication - Sequential/Matrix Multiplication - Sequential.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Matrix Multiplication - Parallel/Matrix Multiplication - Parallel.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Matrix Multiplication - OpenMP/Matrix Multiplication - OpenMP.xcodeproj">
+   </FileRef>
+</Workspace>
