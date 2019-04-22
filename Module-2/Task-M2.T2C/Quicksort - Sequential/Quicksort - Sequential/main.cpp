@@ -67,7 +67,7 @@ vector<int> randomIntVector(int length) {
 int main(int argc, const char * argv[]) {
   startTimer();
   
-  vector<int> v = randomIntVector(10000000);
+  vector<int> v = randomIntVector(100000000);
   
   stopTimer();
   
