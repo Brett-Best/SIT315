@@ -36,13 +36,13 @@ vector<int> quicksort(vector<int> intVector) {
   copy_if(intVector.begin(), intVector.end(), back_inserter(greater), [&](int i) { return i > pivot; });
  
   vector<int> lessSorted = quicksort(less);
-  vector<int> moreSorted = quicksort(greater);
+  vector<int> greaterSorted = quicksort(greater);
   
   vector<int> allSorted;
   
   copy(lessSorted.begin(), lessSorted.end(), back_inserter(allSorted));
   copy(equal.begin(), equal.end(), back_inserter(allSorted));
-  copy(moreSorted.begin(), moreSorted.end(), back_inserter(allSorted));
+  copy(greaterSorted.begin(), greaterSorted.end(), back_inserter(allSorted));
   
   return allSorted;
 }

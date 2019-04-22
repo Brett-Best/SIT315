@@ -9,6 +9,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <vector>
+#include <future>
 
 using namespace std;
 
@@ -22,8 +23,12 @@ void stopTimer() {
   clock_gettime(CLOCK_MONOTONIC, &endTimespec);
 }
 
+int minSizeToThread;
+
 vector<int> quicksort(vector<int> intVector) {
-  if (intVector.size() > 1 == false) {
+  int intVectorSize = (int)intVector.size();
+  
+  if (1 >= intVectorSize) {
     return intVector;
   }
   
@@ -35,14 +40,25 @@ vector<int> quicksort(vector<int> intVector) {
   copy_if(intVector.begin(), intVector.end(), back_inserter(equal), [&](int i) { return i == pivot; });
   copy_if(intVector.begin(), intVector.end(), back_inserter(greater), [&](int i) { return i > pivot; });
   
-  vector<int> lessSorted = quicksort(less);
-  vector<int> moreSorted = quicksort(greater);
+  vector<int> lessSorted;
+  vector<int> greaterSorted;
+  
+  if (intVectorSize >= minSizeToThread) {
+    future<vector<int>> lessSortedFuture(async(quicksort, less));
+    future<vector<int>> greaterSortedFuture(async(quicksort, greater));
+    
+    lessSorted = lessSortedFuture.get();
+    greaterSorted = greaterSortedFuture.get();
+  } else {
+    lessSorted = quicksort(less);
+    greaterSorted = quicksort(greater);
+  }
   
   vector<int> allSorted;
   
   copy(lessSorted.begin(), lessSorted.end(), back_inserter(allSorted));
   copy(equal.begin(), equal.end(), back_inserter(allSorted));
-  copy(moreSorted.begin(), moreSorted.end(), back_inserter(allSorted));
+  copy(greaterSorted.begin(), greaterSorted.end(), back_inserter(allSorted));
   
   return allSorted;
 }
@@ -65,21 +81,29 @@ vector<int> randomIntVector(int length) {
 }
 
 int main(int argc, const char * argv[]) {
+  srand((int)time(NULL));
+  
   startTimer();
   
-  vector<int> v = randomIntVector(100000000);
+  vector<int> v = randomIntVector(10'000);
   
   stopTimer();
   
   printf("Generate Vector: %.3fs\n", durationBetweenTimers());
   
-  startTimer();
-  
-  vector<int> vSorted = quicksort(v);
-  
-  stopTimer();
-  
-  printf("Sort Vectors: %.3fs\n", durationBetweenTimers());
+  printf("Min. Size To Thread, Sort Vector Time\n");
+  for (int i = 0; i <= 10'000; i++) {
+    minSizeToThread = i;
+    startTimer();
+    
+    for (int iteration = 1; iteration <= 10; iteration++) {
+      vector<int> vSorted = quicksort(v);
+    }
+    
+    stopTimer();
+    
+    printf("%i,%.7f\n", minSizeToThread, durationBetweenTimers());
+  }
   
   return 0;
 }
