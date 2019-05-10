@@ -239,6 +239,7 @@
 		0BDA1EF62284F93B0050B953 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = THD97639S3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -248,6 +249,7 @@
 		0BDA1EF72284F93B0050B953 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = THD97639S3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
