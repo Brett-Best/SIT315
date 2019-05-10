@@ -18,6 +18,8 @@
 using namespace std;
 
 #define PRODUCERS_TO_USE 4
+#define CONSUMERS_TO_USE 4
+#define TRAFFIC_LIGHTS 5
 
 #pragma mark - Timers
 struct timespec startTimespec, endTimespec;
@@ -43,6 +45,7 @@ struct TrafficSignalEntry;
 
 vector<TrafficSignalEntry> trafficSignalEntries;
 int trafficSignalEntriesRead = 0;
+bool producersCompleted = false;
 
 mutex trafficSignalEntriesReadMutex;
 
@@ -51,6 +54,8 @@ struct TrafficSignalEntry {
   int id;
   int numberOfCars;
 };
+
+#pragma mark -
 
 class Producer {
   
@@ -112,16 +117,81 @@ public:
       linesProcessed++;
       line++;
     }
+  }
+};
+
+#pragma mark -
+
+int numberOfCars[TRAFFIC_LIGHTS];
+mutex numberOfCarsMutex;
+
+int consumersFinished;
+mutex consumersFinishedMutex;
+
+class Consumer {
+  
+public:
+  void processData(int threadId, int threadCount) {
+    TrafficSignalEntry previousTrafficSignalEntry;
+    long long maxTime = 0;
+    
+    while(!producersCompleted) {
+      trafficSignalEntriesReadMutex.lock();
+      
+      if (trafficSignalEntries.size() == 0) {
+        trafficSignalEntriesReadMutex.unlock();
+        continue;
+      }
+      
+      TrafficSignalEntry trafficSignalEntry = trafficSignalEntries[0];
+      trafficSignalEntries.clear();
+      
+      trafficSignalEntriesReadMutex.unlock();
+      
+      if (maxTime == 0) {
+        maxTime = trafficSignalEntry.timestamp + (60*60);
+      }
+      
+      if (trafficSignalEntry.timestamp < maxTime) {
+        numberOfCarsMutex.lock();
+        numberOfCars[trafficSignalEntry.id] += trafficSignalEntry.numberOfCars;
+        numberOfCarsMutex.unlock();
+      } else {
+        consumersFinishedMutex.lock();
+        consumersFinished++;
+        consumersFinishedMutex.unlock();
+        printf("Consumer finished!\n");
+        
+        bool canContinue = false;
+        while (!canContinue) {
+          consumersFinishedMutex.lock();
+          canContinue = consumersFinished == CONSUMERS_TO_USE;
+          consumersFinishedMutex.unlock();
+        }
+        
+        maxTime = 0;
+      }
+      
+      previousTrafficSignalEntry = trafficSignalEntry;
+    }
+  }
+  
+  void sort(vector<TrafficSignalEntry> trafficSignalEntries, int threadId, int threadCount) {
     
   }
 };
+
+// (int [5]) ::numberOfCars = ([0] = 256, [1] = 176, [2] = 232, [3] = 321, [4] = 172)
+
 
 #pragma mark -
 
 int main(int argc, const char * argv[]) {
   
   thread producerThreads[PRODUCERS_TO_USE];
+  thread consumerThreads[CONSUMERS_TO_USE];
   vector<Producer> producers;
+  vector<Consumer> consumers;
   
   startTimer();
   
@@ -132,8 +202,21 @@ int main(int argc, const char * argv[]) {
     producerThreads[threadId] = thread(&Producer::readCSV, producer, "trafficData.csv", threadId, PRODUCERS_TO_USE);
   }
   
+  for (int threadId = 0; threadId < CONSUMERS_TO_USE; threadId++) {
+    Consumer consumer = Consumer();
+    
+    consumers.push_back(consumer);
+    consumerThreads[threadId] = thread(&Consumer::processData, consumer, threadId, CONSUMERS_TO_USE);
+  }
+  
   for (int threadId = 0; threadId < PRODUCERS_TO_USE; threadId++) {
     producerThreads[threadId].join();
+  }
+  
+  producersCompleted = true;
+  
+  for (int threadId = 0; threadId < CONSUMERS_TO_USE; threadId++) {
+    consumerThreads[threadId].join();
   }
   
   stopTimer();
