@@ -17,7 +17,7 @@
 
 using namespace std;
 
-#define THREADS_TO_USE 3
+#define PRODUCERS_TO_USE 4
 
 #pragma mark - Timers
 struct timespec startTimespec, endTimespec;
@@ -44,7 +44,7 @@ struct TrafficSignalEntry;
 vector<TrafficSignalEntry> trafficSignalEntries;
 int trafficSignalEntriesRead = 0;
 
-mutex trafficSignalEntriesMutex;
+mutex trafficSignalEntriesReadMutex;
 
 struct TrafficSignalEntry {
   long long timestamp;
@@ -98,18 +98,16 @@ public:
       bool processed = false;
       
       while (!processed) {
-        trafficSignalEntriesMutex.lock();
+        trafficSignalEntriesReadMutex.lock();
         
-        if (trafficSignalEntries.size() == line) {
+        if (trafficSignalEntriesRead == line) {
           processed = true;
+          trafficSignalEntriesRead++;
           trafficSignalEntries.push_back(trafficSignalEntry);
         }
         
-        trafficSignalEntriesMutex.unlock();
+        trafficSignalEntriesReadMutex.unlock();
       }
-      
-      
-//      printf("Timestamp: %lli, Id: %i, Number of cars: %i -- Thread Id: %i, Line: %i\n", trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, threadId, line);
       
       linesProcessed++;
       line++;
@@ -122,27 +120,20 @@ public:
 
 int main(int argc, const char * argv[]) {
   
-  thread threads[THREADS_TO_USE];
+  thread producerThreads[PRODUCERS_TO_USE];
   vector<Producer> producers;
   
   startTimer();
   
-  for (int runs = 0; runs < 10000; runs++) {
+  for (int threadId = 0; threadId < PRODUCERS_TO_USE; threadId++) {
+    Producer producer = Producer();
     
-    for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
-      Producer producer = Producer();
-
-      producers.push_back(producer);
-      threads[threadId] = thread(&Producer::readCSV, producer, "trafficData.csv", threadId, THREADS_TO_USE);
-    }
-    
-    for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
-      threads[threadId].join();
-    }
-    
-    if (runs != 9999) {
-    trafficSignalEntries.clear();
-    }
+    producers.push_back(producer);
+    producerThreads[threadId] = thread(&Producer::readCSV, producer, "trafficData.csv", threadId, PRODUCERS_TO_USE);
+  }
+  
+  for (int threadId = 0; threadId < PRODUCERS_TO_USE; threadId++) {
+    producerThreads[threadId].join();
   }
   
   stopTimer();
