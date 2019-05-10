@@ -12,8 +12,17 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <thread>
+#include <mutex>
 
 using namespace std;
+
+#define THREADS_TO_USE 8
+
+struct TrafficSignalEntry;
+
+vector<TrafficSignalEntry> trafficSignalEntries;
+mutex trafficSignalEntriesMutex;
 
 struct TrafficSignalEntry {
   long long timestamp;
@@ -21,46 +30,77 @@ struct TrafficSignalEntry {
   int numberOfCars;
 };
 
-void readCSV(const string &csvPath) {
-  ifstream csvFile;
-  csvFile.open(csvPath.c_str());
+class Producer {
   
-  if (!csvFile.is_open()) {
-    printf("Path is wrong!");
-    exit(EXIT_FAILURE);
-  }
-  
-  vector<TrafficSignalEntry> trafficSignalEntries;
-  
-  string line;
-  getline(csvFile, line); // Skip header row
-  
-  while (getline(csvFile,line)) {
-    if (line.empty()) {
-      continue; // Skip empty lines
+public:
+  void readCSV(const string &csvPath, int threadId, int totalThreads) {
+    ifstream csvFile;
+    csvFile.open(csvPath.c_str());
+    
+    if (!csvFile.is_open()) {
+      printf("Path is wrong!");
+      exit(EXIT_FAILURE);
     }
     
-    istringstream iStringStream(line);
-    string lineStream;
-    string::size_type sz;
+    string lineData;
+    getline(csvFile, lineData); // Skip header row
     
-    vector <long long> row;
+    int line = 0;
+    int linesProcessed = 0;
     
-    while (getline(iStringStream, lineStream, ','))
-    {
-      row.push_back(stoll(lineStream,&sz));
+    while (getline(csvFile,lineData)) {
+      bool shouldProcess = (linesProcessed * totalThreads) + threadId == line;
+      
+      if (!shouldProcess) {
+        line++;
+        continue;
+      }
+      
+      if (lineData.empty()) {
+        continue; // Skip empty lines
+      }
+      
+      istringstream iStringStream(lineData);
+      string lineStream;
+      string::size_type sz;
+      
+      vector <long long> row;
+      
+      while (getline(iStringStream, lineStream, ','))
+      {
+        row.push_back(stoll(lineStream,&sz));
+      }
+      
+      TrafficSignalEntry trafficSignalEntry = TrafficSignalEntry { row[0], (int)row[1], (int)row[2] };
+      
+      trafficSignalEntriesMutex.lock();
+      trafficSignalEntries.push_back(trafficSignalEntry);
+      trafficSignalEntriesMutex.unlock();
+      
+      printf("Timestamp: %lli, Id: %i, Number of cars: %i -- Thread Id: %i, Line: %i\n", trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, threadId, line);
+      
+      linesProcessed++;
+      line++;
     }
     
-    TrafficSignalEntry trafficSignalEntry = TrafficSignalEntry { row[0], (int)row[1], (int)row[2] };
-    trafficSignalEntries.push_back(trafficSignalEntry);
-    
-    printf("Timestamp: %lli, Id: %i, Number of cars: %i\n", trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars);
   }
-  
-}
+};
 
 int main(int argc, const char * argv[]) {
-  readCSV("trafficData.csv");
+  
+  thread threads[THREADS_TO_USE];
+  vector<Producer> producers;
+  
+  for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
+    Producer producer = Producer();
+    producer.readCSV("trafficData.csv", threadId, THREADS_TO_USE);
+//    producers.push_back(producer);
+//    threads[threadId] = thread(&Producer::readCSV, producer, "trafficData.csv", threadId, THREADS_TO_USE);
+  }
+  
+  for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
+//    threads[threadId].join();
+  }
   
   return 0;
 }
