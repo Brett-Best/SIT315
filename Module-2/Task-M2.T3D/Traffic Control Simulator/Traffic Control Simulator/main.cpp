@@ -53,6 +53,8 @@ void readCSV(const string &csvPath) {
     
     TrafficSignalEntry trafficSignalEntry = TrafficSignalEntry { row[0], (int)row[1], (int)row[2] };
     trafficSignalEntries.push_back(trafficSignalEntry);
+    
+    printf("Timestamp: %lli, Id: %i, Number of cars: %i\n", trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars);
   }
   
 }

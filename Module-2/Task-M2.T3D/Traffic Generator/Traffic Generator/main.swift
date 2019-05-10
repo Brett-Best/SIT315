@@ -8,9 +8,9 @@
 
 import Foundation
 
-let totalMeasurements = 12 * 24 * 7
-let trafficSignals = 100
-let maxNumberOfCars = 1000
+let totalMeasurements = 12 * 4
+let trafficSignals = 5
+let maxNumberOfCars = 100
 
 let startDate = Date()
 var currentDate: Date = startDate
