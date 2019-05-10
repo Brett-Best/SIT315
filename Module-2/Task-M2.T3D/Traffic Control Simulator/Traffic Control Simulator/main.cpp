@@ -17,11 +17,33 @@
 
 using namespace std;
 
-#define THREADS_TO_USE 8
+#define THREADS_TO_USE 3
+
+#pragma mark - Timers
+struct timespec startTimespec, endTimespec;
+
+void startTimer() {
+  clock_gettime(CLOCK_MONOTONIC, &startTimespec);
+}
+
+void stopTimer() {
+  clock_gettime(CLOCK_MONOTONIC, &endTimespec);
+}
+
+double durationBetweenTimers() {
+  double seconds = (endTimespec.tv_sec - startTimespec.tv_sec);
+  seconds += (endTimespec.tv_nsec - startTimespec.tv_nsec) / 1000000000.0;
+  
+  return seconds;
+}
+
+#pragma mark - Traffic
 
 struct TrafficSignalEntry;
 
 vector<TrafficSignalEntry> trafficSignalEntries;
+int trafficSignalEntriesRead = 0;
+
 mutex trafficSignalEntriesMutex;
 
 struct TrafficSignalEntry {
@@ -73,11 +95,21 @@ public:
       
       TrafficSignalEntry trafficSignalEntry = TrafficSignalEntry { row[0], (int)row[1], (int)row[2] };
       
-      trafficSignalEntriesMutex.lock();
-      trafficSignalEntries.push_back(trafficSignalEntry);
-      trafficSignalEntriesMutex.unlock();
+      bool processed = false;
       
-      printf("Timestamp: %lli, Id: %i, Number of cars: %i -- Thread Id: %i, Line: %i\n", trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, threadId, line);
+      while (!processed) {
+        trafficSignalEntriesMutex.lock();
+        
+        if (trafficSignalEntries.size() == line) {
+          processed = true;
+          trafficSignalEntries.push_back(trafficSignalEntry);
+        }
+        
+        trafficSignalEntriesMutex.unlock();
+      }
+      
+      
+//      printf("Timestamp: %lli, Id: %i, Number of cars: %i -- Thread Id: %i, Line: %i\n", trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, threadId, line);
       
       linesProcessed++;
       line++;
@@ -86,21 +118,36 @@ public:
   }
 };
 
+#pragma mark -
+
 int main(int argc, const char * argv[]) {
   
   thread threads[THREADS_TO_USE];
   vector<Producer> producers;
   
-  for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
-    Producer producer = Producer();
-    producer.readCSV("trafficData.csv", threadId, THREADS_TO_USE);
-//    producers.push_back(producer);
-//    threads[threadId] = thread(&Producer::readCSV, producer, "trafficData.csv", threadId, THREADS_TO_USE);
+  startTimer();
+  
+  for (int runs = 0; runs < 10000; runs++) {
+    
+    for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
+      Producer producer = Producer();
+
+      producers.push_back(producer);
+      threads[threadId] = thread(&Producer::readCSV, producer, "trafficData.csv", threadId, THREADS_TO_USE);
+    }
+    
+    for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
+      threads[threadId].join();
+    }
+    
+    if (runs != 9999) {
+    trafficSignalEntries.clear();
+    }
   }
   
-  for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
-//    threads[threadId].join();
-  }
+  stopTimer();
+  
+  printf("Read CSV: %.3fs\n", durationBetweenTimers());
   
   return 0;
 }
