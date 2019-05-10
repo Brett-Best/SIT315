@@ -33,7 +33,6 @@ void readCSV(const string &csvPath) {
   vector<TrafficSignalEntry> trafficSignalEntries;
   
   string line;
-  vector <string> vec;
   getline(csvFile, line); // Skip header row
   
   while (getline(csvFile,line)) {
