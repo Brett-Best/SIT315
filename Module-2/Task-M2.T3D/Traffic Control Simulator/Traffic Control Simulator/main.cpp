@@ -17,9 +17,9 @@
 
 using namespace std;
 
-#define PRODUCERS_TO_USE 4
-#define CONSUMERS_TO_USE 4
-#define TRAFFIC_LIGHTS 5
+#define PRODUCERS_TO_USE 2
+#define CONSUMERS_TO_USE 2
+#define TRAFFIC_LIGHTS 3
 
 #pragma mark - Timers
 struct timespec startTimespec, endTimespec;
@@ -45,7 +45,9 @@ struct TrafficSignalEntry;
 
 vector<TrafficSignalEntry> trafficSignalEntries;
 int trafficSignalEntriesRead = 0;
-bool producersCompleted = false;
+
+int producersCompleted = 0;
+mutex producersCompletedMutex;
 
 mutex trafficSignalEntriesReadMutex;
 
@@ -109,6 +111,7 @@ public:
           processed = true;
           trafficSignalEntriesRead++;
           trafficSignalEntries.push_back(trafficSignalEntry);
+          printf("PROCESSED - Thread Id: %i, Id: %i, Number of cars: %i\n", threadId, trafficSignalEntry.id, trafficSignalEntry.numberOfCars);
         }
         
         trafficSignalEntriesReadMutex.unlock();
@@ -117,69 +120,133 @@ public:
       linesProcessed++;
       line++;
     }
+    
+    producersCompletedMutex.lock();
+    producersCompleted++;
+    producersCompletedMutex.unlock();
   }
 };
+
+void printNumberOfCars();
 
 #pragma mark -
 
 int numberOfCars[TRAFFIC_LIGHTS];
 mutex numberOfCarsMutex;
 
-int consumersFinished;
-mutex consumersFinishedMutex;
+bool consumerWaiting[CONSUMERS_TO_USE];
+mutex consumerWaitingMutex;
 
 class Consumer {
   
+  long long maxTime = 0;
+  
 public:
   void processData(int threadId, int threadCount) {
-    TrafficSignalEntry previousTrafficSignalEntry;
-    long long maxTime = 0;
+    bool shouldFinish = false;
     
-    while(!producersCompleted) {
-      trafficSignalEntriesReadMutex.lock();
-      
-      if (trafficSignalEntries.size() == 0) {
-        trafficSignalEntriesReadMutex.unlock();
-        continue;
-      }
-      
-      TrafficSignalEntry trafficSignalEntry = trafficSignalEntries[0];
-      trafficSignalEntries.clear();
-      
-      trafficSignalEntriesReadMutex.unlock();
-      
-      if (maxTime == 0) {
-        maxTime = trafficSignalEntry.timestamp + (60*60);
-      }
-      
-      if (trafficSignalEntry.timestamp < maxTime) {
-        numberOfCarsMutex.lock();
-        numberOfCars[trafficSignalEntry.id] += trafficSignalEntry.numberOfCars;
-        numberOfCarsMutex.unlock();
-      } else {
-        consumersFinishedMutex.lock();
-        consumersFinished++;
-        consumersFinishedMutex.unlock();
-        printf("Consumer finished!\n");
-        
-        bool canContinue = false;
-        while (!canContinue) {
-          consumersFinishedMutex.lock();
-          canContinue = consumersFinished == CONSUMERS_TO_USE;
-          consumersFinishedMutex.unlock();
-        }
-        
-        maxTime = 0;
-      }
-      
-      previousTrafficSignalEntry = trafficSignalEntry;
+    while(!shouldFinish) {
+      shouldFinish = loadData(threadId, threadCount);
     }
   }
   
-  void sort(vector<TrafficSignalEntry> trafficSignalEntries, int threadId, int threadCount) {
+  bool loadData(int threadId, int threadCount) {
+    trafficSignalEntriesReadMutex.lock();
     
+    if (trafficSignalEntries.size() == 0) {
+      handleEmptySignalEntries(threadId, threadCount);
+      trafficSignalEntriesReadMutex.unlock();
+      
+      producersCompletedMutex.lock();
+      if (producersCompleted == PRODUCERS_TO_USE) {
+        producersCompletedMutex.unlock();
+        return true;
+      }
+      producersCompletedMutex.unlock();
+      
+      return false;
+    }
+
+    TrafficSignalEntry trafficSignalEntry = trafficSignalEntries[0];
+    trafficSignalEntries.erase(trafficSignalEntries.begin());
+    
+    trafficSignalEntriesReadMutex.unlock();
+    
+    printf("CONSUMED - Thread Id: %i, Id: %i, Number of cars: %i\n", threadId, trafficSignalEntry.id, trafficSignalEntry.numberOfCars);
+    
+    return false;
+    
+//    if (maxTime == 0) {
+//      maxTime = trafficSignalEntry.timestamp + (60*60);
+//      printf("Thread ID: %i, Max time: %lli\n", threadId, maxTime);
+//    }
+    
+//    if (trafficSignalEntry.timestamp < maxTime) {
+//      numberOfCarsMutex.lock();
+//      numberOfCars[trafficSignalEntry.id] += trafficSignalEntry.numberOfCars;
+//      if (0 == trafficSignalEntry.id) printf("CONSUMED - Thread Id: %i, Id: %i, Number of cars: %i, Total: %i\n", threadId, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, numberOfCars[trafficSignalEntry.id]);
+//      numberOfCarsMutex.unlock();
+//    } else {
+//      consumerWaitingMutex.lock();
+//      consumerWaiting[threadId] = true;
+//      consumerWaitingMutex.unlock();
+//
+//      bool waitingForOtherThreads = true;
+//
+//      while (waitingForOtherThreads) {
+//        consumerWaitingMutex.lock();
+//        if (!consumerWaiting[threadId]) {
+//          waitingForOtherThreads = false;
+//          consumerWaitingMutex.unlock();
+//          continue;
+//        }
+//
+//        bool shouldContinue = true;
+//
+//        for (int i = 0; i < threadCount; i++) {
+//          if (consumerWaiting[i] == false) shouldContinue = false;
+//        }
+//        consumerWaitingMutex.unlock();
+//
+//        if (shouldContinue) {
+//          printNumberOfCars();
+//          maxTime = 0;
+//
+//          numberOfCarsMutex.lock();
+//          printf("Thread ID: %i, CLEARED NUMBER OF CARS\n", threadId);
+//          for (int i = 0; i < TRAFFIC_LIGHTS; i++) {
+//            numberOfCars[i] = 0;
+//          }
+//          numberOfCarsMutex.unlock();
+//
+//          consumerWaitingMutex.lock();
+//          for (int i = 0; i < threadCount; i++) {
+//            consumerWaiting[i] = false;
+//          }
+//          consumerWaitingMutex.unlock();
+//        }
+//      }
+    }
+  
+  
+  bool handleEmptySignalEntries(int threadId, int threadCount) {
+//    if (producersCompleted) {
+//      consumerWaitingMutex.lock();
+//      consumerWaiting[threadId] = true;
+//      consumerWaitingMutex.unlock();
+//      return true;
+//    }
+    
+    return false;
   }
+  
 };
+
+void printNumberOfCars() {
+  numberOfCarsMutex.lock();
+  printf("0: %i, 1: %i, 2: %i\n", numberOfCars[0], numberOfCars[1], numberOfCars[2]);
+  numberOfCarsMutex.unlock();
+}
 
 // (int [5]) ::numberOfCars = ([0] = 256, [1] = 176, [2] = 232, [3] = 321, [4] = 172)
 
@@ -213,7 +280,9 @@ int main(int argc, const char * argv[]) {
     producerThreads[threadId].join();
   }
   
-  producersCompleted = true;
+//  producersCompletedMutex.lock();
+//  producersCompleted = true;
+//  producersCompletedMutex.unlock();
   
   for (int threadId = 0; threadId < CONSUMERS_TO_USE; threadId++) {
     consumerThreads[threadId].join();

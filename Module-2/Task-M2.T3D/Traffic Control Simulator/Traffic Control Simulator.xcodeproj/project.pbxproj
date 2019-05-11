@@ -8,21 +8,25 @@
 
 /* Begin PBXBuildFile section */
 		0BDA1EF22284F93B0050B953 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0BDA1EF12284F93B0050B953 /* main.cpp */; };
+		0BE947B32285FA90001377B8 /* trafficData.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0BCF914C2285D2A700F47293 /* trafficData.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		0BDA1EEC2284F93B0050B953 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
 			files = (
+				0BE947B32285FA90001377B8 /* trafficData.csv in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0BCF914C2285D2A700F47293 /* trafficData.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = trafficData.csv; path = ../../trafficData.csv; sourceTree = "<group>"; };
+		0BCF914D2285D3F300F47293 /* output */ = {isa = PBXFileReference; lastKnownFileType = text; name = output; path = ../../output; sourceTree = "<group>"; };
 		0BDA1EEE2284F93B0050B953 /* Traffic Control Simulator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Traffic Control Simulator"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0BDA1EF12284F93B0050B953 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -57,7 +61,9 @@
 		0BDA1EF02284F93B0050B953 /* Traffic Control Simulator */ = {
 			isa = PBXGroup;
 			children = (
+				0BCF914C2285D2A700F47293 /* trafficData.csv */,
 				0BDA1EF12284F93B0050B953 /* main.cpp */,
+				0BCF914D2285D3F300F47293 /* output */,
 			);
 			path = "Traffic Control Simulator";
 			sourceTree = "<group>";
