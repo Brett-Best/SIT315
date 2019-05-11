@@ -15,12 +15,15 @@ let maxNumberOfCars = 100000
 let startDate = Date()
 var currentDate: Date = startDate
 
-print("timestamp,trafficSignal,numberOfCars")
+var totalNumberOfCars = 0
+
+print("timestamp,trafficSignal,numberOfCars,totalNumberOfCars")
 
 (0..<totalMeasurements).forEach { measurement in
   (0..<trafficSignals).forEach { trafficSignal in
     let numberOfCars = Int.random(in: 0...maxNumberOfCars)
-    print("\(Int(currentDate.timeIntervalSince1970)),\(trafficSignal),\(numberOfCars)")
+    totalNumberOfCars = totalNumberOfCars + numberOfCars
+    print("\(Int(currentDate.timeIntervalSince1970)),\(trafficSignal),\(numberOfCars),\(totalNumberOfCars)")
   }
   currentDate = currentDate.addingTimeInterval(60*5)
 }
