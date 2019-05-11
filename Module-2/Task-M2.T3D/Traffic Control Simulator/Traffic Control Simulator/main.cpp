@@ -54,9 +54,23 @@ struct TrafficSignalMetric {
   long long startTimeStamp;
   long long endTimeStamp;
   map<int, int> trafficSignalToCarsMap;
+  map<int, int, greater<int>> carsToTrafficSignalMap;
   
   void sort() {
+    if (trafficSignalToCarsMap.size() == carsToTrafficSignalMap.size()) {
+      printf("ALREADY SORTED\n");
+      return; // Already sorted!
+    }
     
+    for (const auto &pair : trafficSignalToCarsMap) {
+      carsToTrafficSignalMap.insert(make_pair(pair.second, pair.first));
+    }
+    
+    printf("METRIC SORTED - Start: %llu, End: %llu, Lights-Cars: [", startTimeStamp, endTimeStamp);
+    for (const auto &pair : carsToTrafficSignalMap) {
+      printf("%i-%i cars, ", pair.second, pair.first);
+    }
+    printf("]\n");
   }
 };
 
@@ -183,9 +197,9 @@ public:
     trafficSignalEntries.erase(trafficSignalEntries.begin());
     
     unsigned long size = trafficSignalEntries.size();
+    printf("CONSUMED - Thread Id: %i, Timestamp: %lli, Id: %i, Number of cars: %i, Total number of cars: %i, Size: %lu\n", threadId, trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, 0, size);
     createNewTrafficMetricIfNeeded(trafficSignalEntry);
     updateTrafficMetric(trafficSignalEntry);
-    printf("CONSUMED - Thread Id: %i, Timestamp: %lli, Id: %i, Number of cars: %i, Total number of cars: %i, Size: %lu\n", threadId, trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, 0, size);
     trafficSignalEntriesReadMutex.unlock();
     
     return false;
@@ -197,6 +211,10 @@ public:
     
     if (producersCompleted == PRODUCERS_TO_USE) {
       producersCompletedMutex.unlock();
+      trafficSignalMetricsMutex.lock();
+      trafficSignalMetrics.back().sort();
+      trafficSignalMetricsMutex.unlock();
+      printf("CONSUMER FINISHED\n");
       return true;
     }
     
@@ -210,6 +228,10 @@ public:
     
     trafficSignalMetricsMutex.lock();
     if (trafficSignalMetrics.size() <= index) {
+      if (index != 0) {
+        trafficSignalMetrics[index-1].sort();
+      }
+      
       long long startTimeStamp = firstTrafficSignalEntry.timestamp + 60*60*index;
       long long endTimeStamp = startTimeStamp + 60*60;
       trafficSignalMetrics.push_back(TrafficSignalMetric{ startTimeStamp, endTimeStamp });
@@ -225,11 +247,11 @@ public:
     trafficSignalMetricsMutex.lock();
     TrafficSignalMetric *trafficSignalMetric = &trafficSignalMetrics[index];
     trafficSignalMetric->trafficSignalToCarsMap[trafficSignalEntry.id] += trafficSignalEntry.numberOfCars;
-    printf("METRIC UPDATED - Count: ");
-    for (const auto &pair : trafficSignalMetrics[index].trafficSignalToCarsMap) {
-      printf("map[%i] = %i, ", pair.first, pair.second);
+    printf("METRIC UPDATED - Start: %llu, End: %llu, Lights-Cars: [", trafficSignalMetric->startTimeStamp, trafficSignalMetric->endTimeStamp);
+    for (const auto &pair : trafficSignalMetric->trafficSignalToCarsMap) {
+      printf("%i-%i cars, ", pair.second, pair.first);
     }
-    printf("\n");
+    printf("]\n");
     trafficSignalMetricsMutex.unlock();
   }
   
