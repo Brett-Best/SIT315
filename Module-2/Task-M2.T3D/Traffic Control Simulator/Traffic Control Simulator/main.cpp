@@ -14,6 +14,8 @@
 #include <sstream>
 #include <thread>
 #include <mutex>
+#include <map>
+#include <math.h>
 
 using namespace std;
 
@@ -42,8 +44,23 @@ double durationBetweenTimers() {
 
 #pragma mark - Traffic
 
-struct TrafficSignalEntry;
+struct TrafficSignalEntry {
+  long long timestamp;
+  int id;
+  int numberOfCars;
+};
 
+struct TrafficSignalMetric {
+  long long startTimeStamp;
+  long long endTimeStamp;
+  map<int, int> trafficSignalToCarsMap;
+  
+  void sort() {
+    
+  }
+};
+
+TrafficSignalEntry firstTrafficSignalEntry;
 vector<TrafficSignalEntry> trafficSignalEntries;
 int trafficSignalEntriesRead = 0;
 
@@ -51,12 +68,6 @@ int producersCompleted = 0;
 mutex producersCompletedMutex;
 
 mutex trafficSignalEntriesReadMutex;
-
-struct TrafficSignalEntry {
-  long long timestamp;
-  int id;
-  int numberOfCars;
-};
 
 #pragma mark -
 
@@ -102,6 +113,7 @@ public:
       }
       
       TrafficSignalEntry trafficSignalEntry = TrafficSignalEntry { row[0], (int)row[1], (int)row[2] };
+      if (line == 0) firstTrafficSignalEntry = trafficSignalEntry;
       
       bool processed = false;
       
@@ -140,15 +152,15 @@ void printNumberOfCars();
 
 #pragma mark -
 
-int numberOfCars;
-mutex numberOfCarsMutex;
+vector<TrafficSignalMetric> trafficSignalMetrics;
+mutex trafficSignalMetricsMutex;
 
-bool consumerWaiting[CONSUMERS_TO_USE];
-mutex consumerWaitingMutex;
+
 
 class Consumer {
   
   long long maxTime = 0;
+  TrafficSignalEntry lastTrafficSignalEntry;
   
 public:
   void processData(int threadId, int threadCount) {
@@ -170,12 +182,10 @@ public:
     TrafficSignalEntry trafficSignalEntry = trafficSignalEntries[0];
     trafficSignalEntries.erase(trafficSignalEntries.begin());
     
-    
-    numberOfCarsMutex.lock();
-    numberOfCars += trafficSignalEntry.numberOfCars;
     unsigned long size = trafficSignalEntries.size();
-    printf("CONSUMED - Thread Id: %i, Timestamp: %lli, Id: %i, Number of cars: %i, Total number of cars: %i, Size: %lu\n", threadId, trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, numberOfCars, size);
-    numberOfCarsMutex.unlock();
+    createNewTrafficMetricIfNeeded(trafficSignalEntry);
+    updateTrafficMetric(trafficSignalEntry);
+    printf("CONSUMED - Thread Id: %i, Timestamp: %lli, Id: %i, Number of cars: %i, Total number of cars: %i, Size: %lu\n", threadId, trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, 0, size);
     trafficSignalEntriesReadMutex.unlock();
     
     return false;
@@ -193,6 +203,39 @@ public:
     producersCompletedMutex.unlock();
     
     return false;
+  }
+  
+  void createNewTrafficMetricIfNeeded(TrafficSignalEntry trafficSignalEntry) {
+    long long index = indexForTrafficSignalEntry(trafficSignalEntry);
+    
+    trafficSignalMetricsMutex.lock();
+    if (trafficSignalMetrics.size() <= index) {
+      long long startTimeStamp = firstTrafficSignalEntry.timestamp + 60*60*index;
+      long long endTimeStamp = startTimeStamp + 60*60;
+      trafficSignalMetrics.push_back(TrafficSignalMetric{ startTimeStamp, endTimeStamp });
+      
+      TrafficSignalMetric metric = trafficSignalMetrics[index];
+      printf("METRIC CREATED - Start: %llu, End: %llu, Map Count: %lu, Metric Count: %lu\n", metric.startTimeStamp, metric.endTimeStamp, metric.trafficSignalToCarsMap.size(), trafficSignalMetrics.size());
+    }
+    trafficSignalMetricsMutex.unlock();
+  }
+  
+  void updateTrafficMetric(TrafficSignalEntry trafficSignalEntry) {
+    long long index = indexForTrafficSignalEntry(trafficSignalEntry);
+    trafficSignalMetricsMutex.lock();
+    TrafficSignalMetric *trafficSignalMetric = &trafficSignalMetrics[index];
+    trafficSignalMetric->trafficSignalToCarsMap[trafficSignalEntry.id] += trafficSignalEntry.numberOfCars;
+    printf("METRIC UPDATED - Count: ");
+    for (const auto &pair : trafficSignalMetrics[index].trafficSignalToCarsMap) {
+      printf("map[%i] = %i, ", pair.first, pair.second);
+    }
+    printf("\n");
+    trafficSignalMetricsMutex.unlock();
+  }
+  
+  long long indexForTrafficSignalEntry(TrafficSignalEntry trafficSignalEntry) {
+    long long offset = trafficSignalEntry.timestamp-firstTrafficSignalEntry.timestamp;
+    return (long long)floor(offset/60.0/60.0);
   }
   
 };
