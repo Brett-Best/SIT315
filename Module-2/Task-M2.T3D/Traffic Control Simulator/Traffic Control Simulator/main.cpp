@@ -248,15 +248,15 @@ public:
     TrafficSignalMetric *trafficSignalMetric = &trafficSignalMetrics[index]; // Get the traffic signal metric that needs updating
     trafficSignalMetric->trafficSignalToCarsMap[trafficSignalEntry.id] += trafficSignalEntry.numberOfCars; // Add to the entry to the map value
     printf("METRIC UPDATED - Start: %llu, End: %llu, Lights-Cars: [", trafficSignalMetric->startTimeStamp, trafficSignalMetric->endTimeStamp); // Just for logging purposess and self validation
-    for (const auto &pair : trafficSignalMetric->trafficSignalToCarsMap) { // 
+    for (const auto &pair : trafficSignalMetric->trafficSignalToCarsMap) { // logging purposes
       printf("%i-%i cars, ", pair.second, pair.first);
     }
     printf("]\n");
-    trafficSignalMetricsMutex.unlock();
+    trafficSignalMetricsMutex.unlock(); // Unlock the mutex
   }
   
   long long indexForTrafficSignalEntry(TrafficSignalEntry trafficSignalEntry) {
-    long long offset = trafficSignalEntry.timestamp-firstTrafficSignalEntry.timestamp;
+    long long offset = trafficSignalEntry.timestamp-firstTrafficSignalEntry.timestamp; // Genreate a metric index based on a 60 minute duration
     return (long long)floor(offset/60.0/60.0);
   }
   
