@@ -19,23 +19,23 @@
 
 using namespace std;
 
-#define PRODUCERS_TO_USE 4
-#define CONSUMERS_TO_USE 4
+#define PRODUCERS_TO_USE 2 // Specify how many producers to use
+#define CONSUMERS_TO_USE 2 // Specify how many consumers to use
 #define READ_BUFFER_SIZE 5 // Max number of entries to have in memory
-#define TRAFFIC_LIGHTS 3
+#define TRAFFIC_LIGHTS 3 // This isn't used
 
 #pragma mark - Timers
-struct timespec startTimespec, endTimespec;
+struct timespec startTimespec, endTimespec; // Use for timing how long the project runs for
 
-void startTimer() {
+void startTimer() { // Starts a timer
   clock_gettime(CLOCK_MONOTONIC, &startTimespec);
 }
 
-void stopTimer() {
+void stopTimer() { // Stops the timer
   clock_gettime(CLOCK_MONOTONIC, &endTimespec);
 }
 
-double durationBetweenTimers() {
+double durationBetweenTimers() { // Calculate the time between start and finish
   double seconds = (endTimespec.tv_sec - startTimespec.tv_sec);
   seconds += (endTimespec.tv_nsec - startTimespec.tv_nsec) / 1000000000.0;
   
@@ -44,69 +44,69 @@ double durationBetweenTimers() {
 
 #pragma mark - Traffic
 
-struct TrafficSignalEntry {
+struct TrafficSignalEntry { // Model to represent the entry in each CSV line
   long long timestamp;
   int id;
   int numberOfCars;
 };
 
-struct TrafficSignalMetric {
-  long long startTimeStamp;
-  long long endTimeStamp;
-  map<int, int> trafficSignalToCarsMap;
-  map<int, int, greater<int>> carsToTrafficSignalMap;
+struct TrafficSignalMetric { // Model to represent a an hour of traffic
+  long long startTimeStamp; // When the sample begins
+  long long endTimeStamp; // When the sample ends
+  map<int, int> trafficSignalToCarsMap; // a map of traffic signal ids to number of cars
+  map<int, int, greater<int>> carsToTrafficSignalMap; // a map of the number of cars to traffic light - sorted using greater
   
-  void sort() {
-    if (trafficSignalToCarsMap.size() == carsToTrafficSignalMap.size()) {
+  void sort() { // Sort the values included in this traffic metric
+    if (trafficSignalToCarsMap.size() == carsToTrafficSignalMap.size()) { // Determine if we have already sorted this traffic metric
       printf("ALREADY SORTED\n");
       return; // Already sorted!
     }
     
-    for (const auto &pair : trafficSignalToCarsMap) {
+    for (const auto &pair : trafficSignalToCarsMap) { // Insert new pair into the carsToTrafficSignalMap (so that it sorts)
       carsToTrafficSignalMap.insert(make_pair(pair.second, pair.first));
     }
     
     printf("METRIC SORTED - Start: %llu, End: %llu, Lights-Cars: [", startTimeStamp, endTimeStamp);
-    for (const auto &pair : carsToTrafficSignalMap) {
+    for (const auto &pair : carsToTrafficSignalMap) { // Simmply log the information to the console.
       printf("%i-%i cars, ", pair.second, pair.first);
     }
     printf("]\n");
   }
 };
 
-TrafficSignalEntry firstTrafficSignalEntry;
-vector<TrafficSignalEntry> trafficSignalEntries;
-int trafficSignalEntriesRead = 0;
+TrafficSignalEntry firstTrafficSignalEntry; // This is populated with the first traffic signal from the data
+vector<TrafficSignalEntry> trafficSignalEntries; // This is a buffer of the traffic signals
+int trafficSignalEntriesRead = 0; // Count of how many traffic signal read so far
 
-int producersCompleted = 0;
-mutex producersCompletedMutex;
+int producersCompleted = 0; // Count of how many producers have finished
+mutex producersCompletedMutex; // A mutex used when accessing the producersCompleted variable above
 
-mutex trafficSignalEntriesReadMutex;
+mutex trafficSignalEntriesReadMutex; // A mutex used when accessing the trafficSignalEntries variable (above a few lines up)
 
 #pragma mark -
 
-class Producer {
+class Producer { // A producer class that adds to the buffer
   
 public:
-  void readCSV(const string &csvPath, int threadId, int totalThreads) {
-    ifstream csvFile;
-    csvFile.open(csvPath.c_str());
+  void readCSV(const string &csvPath, int threadId, int totalThreads) { // A method to read from the CSV
+    ifstream csvFile; // Create a stream to access the CSV file with
+    csvFile.open(csvPath.c_str()); // Open the file and convert the path to a c string
     
-    if (!csvFile.is_open()) {
+    if (!csvFile.is_open()) { // Unable to open the file, perhaps the path is wrong
       printf("Path is wrong!");
       exit(EXIT_FAILURE);
     }
     
-    string lineData;
+    string lineData; // The current line data
     getline(csvFile, lineData); // Skip header row
     
-    int line = 0;
-    int linesProcessed = 0;
+    int line = 0; // The current line
+    int linesProcessed = 0; // The amount of lines processed
     
-    while (getline(csvFile,lineData)) {
-      bool shouldProcess = (linesProcessed * totalThreads) + threadId == line;
+    while (getline(csvFile,lineData)) { // Enumerate over the contents of the CSV
+      bool shouldProcess = (linesProcessed * totalThreads) + threadId == line; // Work out if this producer should process this line by thread id / thread count
       
-      if (!shouldProcess) {
+      if (!shouldProcess) { // Go onto next line as this producer isn't supposed to process the current line
         line++;
         continue;
       }
@@ -115,50 +115,50 @@ public:
         continue; // Skip empty lines
       }
       
-      istringstream iStringStream(lineData);
+      istringstream iStringStream(lineData); // Create a string stream from the line data
       string lineStream;
       string::size_type sz;
       
-      vector <long long> row;
+      vector <long long> row; // TO sure the command separated values
       
       while (getline(iStringStream, lineStream, ','))
       {
-        row.push_back(stoll(lineStream,&sz));
+        row.push_back(stoll(lineStream,&sz)); // Add all values to the row vector
       }
       
-      TrafficSignalEntry trafficSignalEntry = TrafficSignalEntry { row[0], (int)row[1], (int)row[2] };
-      if (line == 0) firstTrafficSignalEntry = trafficSignalEntry;
+      TrafficSignalEntry trafficSignalEntry = TrafficSignalEntry { row[0], (int)row[1], (int)row[2] }; // Create a traffic signal entry with the data
+      if (line == 0) firstTrafficSignalEntry = trafficSignalEntry; // If the first line store it in the variable
       
       bool processed = false;
       
-      while (!processed) {
-        trafficSignalEntriesReadMutex.lock();
+      while (!processed) { // We are going to try to add to the trraffic signal entries
+        trafficSignalEntriesReadMutex.lock(); // Get a lock on the traffic signal entries
         
         if (trafficSignalEntriesRead == line) {
           unsigned long size = trafficSignalEntries.size();
-          if (size >= READ_BUFFER_SIZE) {
-            trafficSignalEntriesReadMutex.unlock();
+          if (size >= READ_BUFFER_SIZE) { // Buffer is full, delay processing
+            trafficSignalEntriesReadMutex.unlock(); // Unlock the traffic signal entries
             printf("DELAYED - Thread Id: %i, Timestamp: %lli, Id: %i, Number of cars: %i, Size: %lu\n", threadId, trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, size);
             continue;
           }
           
           processed = true;
           trafficSignalEntriesRead++;
-          trafficSignalEntries.push_back(trafficSignalEntry);
+          trafficSignalEntries.push_back(trafficSignalEntry); // Add to the traffic signal entries buffer
           size = trafficSignalEntries.size();
           printf("PROCESSED - Thread Id: %i, Timestamp: %lli, Id: %i, Number of cars: %i, Size: %lu\n", threadId, trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, size);
         }
         
-        trafficSignalEntriesReadMutex.unlock();
+        trafficSignalEntriesReadMutex.unlock(); // unlock the traffic signal entries
       }
       
       linesProcessed++;
       line++;
     }
     
-    producersCompletedMutex.lock();
-    producersCompleted++;
-    producersCompletedMutex.unlock();
+    producersCompletedMutex.lock(); // Lock the producers completed count
+    producersCompleted++; // Add to that count
+    producersCompletedMutex.unlock(); // Unlock the producers count
   }
 };
 
