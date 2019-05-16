@@ -162,57 +162,57 @@ public:
   }
 };
 
-void printNumberOfCars();
+void printNumberOfCars(); // Forward declare the print number of cars function
 
 #pragma mark -
 
-vector<TrafficSignalMetric> trafficSignalMetrics;
-mutex trafficSignalMetricsMutex;
+vector<TrafficSignalMetric> trafficSignalMetrics; // Array of traffic signal metrics, 1 per hour
+mutex trafficSignalMetricsMutex; // Traffic signal metrics mutex for variable above
 
 
 
-class Consumer {
+class Consumer { // A consumer class that reads from the buffer and creates metrics
   
-  long long maxTime = 0;
-  TrafficSignalEntry lastTrafficSignalEntry;
-  
+  long long maxTime = 0; // Not actually used
+  TrafficSignalEntry lastTrafficSignalEntry; // The last signal entry processed
+
 public:
-  void processData(int threadId, int threadCount) {
-    bool shouldFinish = false;
+  void processData(int threadId, int threadCount) { // Process some data
+    bool shouldFinish = false; // Variable to determine if the consumer is completed and should finish
     
-    while(!shouldFinish) {
-      shouldFinish = loadData(threadId, threadCount);
+    while(!shouldFinish) { // Keep going until the consumer should finish
+      shouldFinish = loadData(threadId, threadCount); // Load some data
     }
   }
   
-  bool loadData(int threadId, int threadCount) {
-    trafficSignalEntriesReadMutex.lock();
+  bool loadData(int threadId, int threadCount) { // Loads data from the traffic signal entries
+    trafficSignalEntriesReadMutex.lock(); // Lock the variable while we access it
     
-    if (trafficSignalEntries.size() == 0) {
-      trafficSignalEntriesReadMutex.unlock();
-      return handleEmptySignalEntries(threadId, threadCount);
+    if (trafficSignalEntries.size() == 0) { // If no entries to process on the buffer
+      trafficSignalEntriesReadMutex.unlock(); // Unlock the traffic signal entries
+      return handleEmptySignalEntries(threadId, threadCount); // A method to check if all the producers are completed and no more data to process
     }
 
-    TrafficSignalEntry trafficSignalEntry = trafficSignalEntries[0];
-    trafficSignalEntries.erase(trafficSignalEntries.begin());
+    TrafficSignalEntry trafficSignalEntry = trafficSignalEntries[0]; // Get the next traffic signal from the buffer
+    trafficSignalEntries.erase(trafficSignalEntries.begin()); // Erase the entry we have just read from the buffer
     
-    unsigned long size = trafficSignalEntries.size();
+    unsigned long size = trafficSignalEntries.size(); // Get the size of the buffer that is remaining for logging purposes (validation)
     printf("CONSUMED - Thread Id: %i, Timestamp: %lli, Id: %i, Number of cars: %i, Total number of cars: %i, Size: %lu\n", threadId, trafficSignalEntry.timestamp, trafficSignalEntry.id, trafficSignalEntry.numberOfCars, 0, size);
-    createNewTrafficMetricIfNeeded(trafficSignalEntry);
-    updateTrafficMetric(trafficSignalEntry);
-    trafficSignalEntriesReadMutex.unlock();
+    createNewTrafficMetricIfNeeded(trafficSignalEntry); // Create a new traffic metric if one doesnt exist already
+    updateTrafficMetric(trafficSignalEntry); // Update the traffic signal metric with this traffic signal entry
+    trafficSignalEntriesReadMutex.unlock(); // Unlock the traffic signal entries mutex
     
     return false;
     }
   
   
-  bool handleEmptySignalEntries(int threadId, int threadCount) {
+  bool handleEmptySignalEntries(int threadId, int threadCount) { // A function to determine if no more entries will be added to the buffer as all producers completed
     producersCompletedMutex.lock();
     
-    if (producersCompleted == PRODUCERS_TO_USE) {
+    if (producersCompleted == PRODUCERS_TO_USE) { // Check to see if all the producers are done using the lock as appropriate
       producersCompletedMutex.unlock();
       trafficSignalMetricsMutex.lock();
-      trafficSignalMetrics.back().sort();
+      trafficSignalMetrics.back().sort(); // Sort the last traffic signal metric as no more data will be added
       trafficSignalMetricsMutex.unlock();
       printf("CONSUMER FINISHED\n");
       return true;
@@ -223,16 +223,16 @@ public:
     return false;
   }
   
-  void createNewTrafficMetricIfNeeded(TrafficSignalEntry trafficSignalEntry) {
-    long long index = indexForTrafficSignalEntry(trafficSignalEntry);
+  void createNewTrafficMetricIfNeeded(TrafficSignalEntry trafficSignalEntry) { // Create a new traffic signal metric for the traffic signal if an appropriate one doesn't exist
+    long long index = indexForTrafficSignalEntry(trafficSignalEntry); // generate an index for the appropriate metric (this is based on the 60min duration of a metric)
     
-    trafficSignalMetricsMutex.lock();
-    if (trafficSignalMetrics.size() <= index) {
+    trafficSignalMetricsMutex.lock(); // While we are going to add to the traffic signal metrics, lock it
+    if (trafficSignalMetrics.size() <= index) { // We need to create a new traffic signal metrics
       if (index != 0) {
-        trafficSignalMetrics[index-1].sort();
+        trafficSignalMetrics[index-1].sort(); // Sort the previous traffic signal metric
       }
       
-      long long startTimeStamp = firstTrafficSignalEntry.timestamp + 60*60*index;
+      long long startTimeStamp = firstTrafficSignalEntry.timestamp + 60*60*index; // Calculate a start time stamp for the metric
       long long endTimeStamp = startTimeStamp + 60*60;
       trafficSignalMetrics.push_back(TrafficSignalMetric{ startTimeStamp, endTimeStamp });
       
