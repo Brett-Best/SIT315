@@ -233,22 +233,22 @@ public:
       }
       
       long long startTimeStamp = firstTrafficSignalEntry.timestamp + 60*60*index; // Calculate a start time stamp for the metric
-      long long endTimeStamp = startTimeStamp + 60*60;
-      trafficSignalMetrics.push_back(TrafficSignalMetric{ startTimeStamp, endTimeStamp });
+      long long endTimeStamp = startTimeStamp + 60*60; // Calculate a end time stamp for the metric
+      trafficSignalMetrics.push_back(TrafficSignalMetric{ startTimeStamp, endTimeStamp }); // Create + add the metric to the vector
       
-      TrafficSignalMetric metric = trafficSignalMetrics[index];
+      TrafficSignalMetric metric = trafficSignalMetrics[index]; // retrieve the metric from the vector for logging purposes and my validation
       printf("METRIC CREATED - Start: %llu, End: %llu, Map Count: %lu, Metric Count: %lu\n", metric.startTimeStamp, metric.endTimeStamp, metric.trafficSignalToCarsMap.size(), trafficSignalMetrics.size());
     }
-    trafficSignalMetricsMutex.unlock();
+    trafficSignalMetricsMutex.unlock(); // No loonger need the lock
   }
   
-  void updateTrafficMetric(TrafficSignalEntry trafficSignalEntry) {
-    long long index = indexForTrafficSignalEntry(trafficSignalEntry);
-    trafficSignalMetricsMutex.lock();
-    TrafficSignalMetric *trafficSignalMetric = &trafficSignalMetrics[index];
-    trafficSignalMetric->trafficSignalToCarsMap[trafficSignalEntry.id] += trafficSignalEntry.numberOfCars;
-    printf("METRIC UPDATED - Start: %llu, End: %llu, Lights-Cars: [", trafficSignalMetric->startTimeStamp, trafficSignalMetric->endTimeStamp);
-    for (const auto &pair : trafficSignalMetric->trafficSignalToCarsMap) {
+  void updateTrafficMetric(TrafficSignalEntry trafficSignalEntry) { // Update the traffic signal entry by adding a new signal entry to it
+    long long index = indexForTrafficSignalEntry(trafficSignalEntry); // generate an index for the appropriate metric (this is based on the 60min duration of a metric)
+    trafficSignalMetricsMutex.lock(); // Lock the traffic signal metrics
+    TrafficSignalMetric *trafficSignalMetric = &trafficSignalMetrics[index]; // Get the traffic signal metric that needs updating
+    trafficSignalMetric->trafficSignalToCarsMap[trafficSignalEntry.id] += trafficSignalEntry.numberOfCars; // Add to the entry to the map value
+    printf("METRIC UPDATED - Start: %llu, End: %llu, Lights-Cars: [", trafficSignalMetric->startTimeStamp, trafficSignalMetric->endTimeStamp); // Just for logging purposess and self validation
+    for (const auto &pair : trafficSignalMetric->trafficSignalToCarsMap) { // 
       printf("%i-%i cars, ", pair.second, pair.first);
     }
     printf("]\n");
