@@ -67,34 +67,34 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--use-hwthread-cpus"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--verbose"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-c 4"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-c 9"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--host localhost:1,macos-build-machine-1.shared:2,macos-build-machine-2.shared:2,macos-build-machine-3.shared:2,macos-build-machine-4.shared:2"
+            argument = "--host 10.211.55.17:1,10.211.55.19:1,10.211.55.20:1,10.211.55.21:1"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--mca orte_tmpdir_base /tmp"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--mca orte_base_help_aggregate 0"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--path &quot;/Volumes/Shared Folders/Module-3/DerivedData/MPI Matrix Multiplication/Build/Products/Debug/&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--path &quot;/Volumes/Brett Best&apos;s Public Folder/SIT315-Repo/Module-3/DerivedData/MPI Matrix Multiplication/Build/Products/Debug/&quot;"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "MM-MPI-P"
+            argument = "$(PRODUCT_NAME)"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
