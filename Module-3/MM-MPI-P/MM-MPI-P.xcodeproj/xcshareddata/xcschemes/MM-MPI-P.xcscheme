@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-               BuildableName = "MM-MPI-P"
+               BuildableName = "MM-MPI-P-13335"
                BlueprintName = "MM-MPI-P"
                ReferencedContainer = "container:MM-MPI-P.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-            BuildableName = "MM-MPI-P"
+            BuildableName = "MM-MPI-P-13335"
             BlueprintName = "MM-MPI-P"
             ReferencedContainer = "container:MM-MPI-P.xcodeproj">
          </BuildableReference>
@@ -59,7 +59,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-            BuildableName = "MM-MPI-P"
+            BuildableName = "MM-MPI-P-13335"
             BlueprintName = "MM-MPI-P"
             ReferencedContainer = "container:MM-MPI-P.xcodeproj">
          </BuildableReference>
@@ -67,27 +67,27 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--use-hwthread-cpus"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--verbose"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-c 4"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--host 10.211.55.17:1,10.211.55.19:1,10.211.55.20:1,10.211.55.21:1"
+            argument = "--verbose"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-np 9"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--host 10.0.0.1:1,10.0.0.29:2,10.0.0.124:2,10.0.0.75:2,10.0.0.116:2"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--mca orte_tmpdir_base /tmp"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--mca orte_base_help_aggregate 0"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--path &quot;/Volumes/Shared Folders/Module-3/DerivedData/MPI Matrix Multiplication/Build/Products/Debug/&quot;"
@@ -112,7 +112,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-            BuildableName = "MM-MPI-P"
+            BuildableName = "MM-MPI-P-13335"
             BlueprintName = "MM-MPI-P"
             ReferencedContainer = "container:MM-MPI-P.xcodeproj">
          </BuildableReference>

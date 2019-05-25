@@ -24,7 +24,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0B5E8AD82299643E007F7DC0 /* MM-MPI-P-10967 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "MM-MPI-P-10967"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B5E8AD82299643E007F7DC0 /* MM-MPI-P-18813 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "MM-MPI-P-18813"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B5E8ADB2299643E007F7DC0 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0B5E8AE3229968AA007F7DC0 /* opal_wrapper */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = opal_wrapper; path = "../../../../../../usr/local/Cellar/open-mpi/4.0.1_1/bin/opal_wrapper"; sourceTree = "<group>"; };
 		0B5E8AE522996947007F7DC0 /* libmpi.40.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.40.dylib; path = "../../../../../../usr/local/Cellar/open-mpi/4.0.1_1/lib/libmpi.40.dylib"; sourceTree = "<group>"; };
@@ -55,7 +55,7 @@
 		0B5E8AD92299643E007F7DC0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0B5E8AD82299643E007F7DC0 /* MM-MPI-P-10967 */,
+				0B5E8AD82299643E007F7DC0 /* MM-MPI-P-18813 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -96,7 +96,7 @@
 			);
 			name = "MM-MPI-P";
 			productName = "MM-MPI-P";
-			productReference = 0B5E8AD82299643E007F7DC0 /* MM-MPI-P-10967 */;
+			productReference = 0B5E8AD82299643E007F7DC0 /* MM-MPI-P-18813 */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
