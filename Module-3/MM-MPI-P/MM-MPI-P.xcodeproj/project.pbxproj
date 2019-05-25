@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0B5E8ADC2299643E007F7DC0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B5E8ADB2299643E007F7DC0 /* main.cpp */; };
+		0B5E8AE622996947007F7DC0 /* libmpi.40.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B5E8AE522996947007F7DC0 /* libmpi.40.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +26,8 @@
 /* Begin PBXFileReference section */
 		0B5E8AD82299643E007F7DC0 /* MM-MPI-P */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "MM-MPI-P"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B5E8ADB2299643E007F7DC0 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		0B5E8AE3229968AA007F7DC0 /* opal_wrapper */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = opal_wrapper; path = "../../../../../../usr/local/Cellar/open-mpi/4.0.1_1/bin/opal_wrapper"; sourceTree = "<group>"; };
+		0B5E8AE522996947007F7DC0 /* libmpi.40.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.40.dylib; path = "../../../../../../usr/local/Cellar/open-mpi/4.0.1_1/lib/libmpi.40.dylib"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B5E8AE622996947007F7DC0 /* libmpi.40.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,6 +47,7 @@
 			children = (
 				0B5E8ADA2299643E007F7DC0 /* MM-MPI-P */,
 				0B5E8AD92299643E007F7DC0 /* Products */,
+				0B5E8AE2229968AA007F7DC0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -60,6 +65,15 @@
 				0B5E8ADB2299643E007F7DC0 /* main.cpp */,
 			);
 			path = "MM-MPI-P";
+			sourceTree = "<group>";
+		};
+		0B5E8AE2229968AA007F7DC0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0B5E8AE522996947007F7DC0 /* libmpi.40.dylib */,
+				0B5E8AE3229968AA007F7DC0 /* opal_wrapper */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -239,8 +253,14 @@
 		0B5E8AE02299643E007F7DC0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CC = "/usr/local/bin/mpic++";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = THD97639S3;
+				HEADER_SEARCH_PATHS = "/usr/local/Cellar/open-mpi/4.0.1_1/include";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/usr/local/Cellar/open-mpi/4.0.1_1/lib",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -248,8 +268,14 @@
 		0B5E8AE12299643E007F7DC0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CC = "/usr/local/bin/mpic++";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = THD97639S3;
+				HEADER_SEARCH_PATHS = "/usr/local/Cellar/open-mpi/4.0.1_1/include";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/usr/local/Cellar/open-mpi/4.0.1_1/lib",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
