@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-               BuildableName = "MM-MPI-P-19364"
-               BlueprintName = "MM-MPI-P"
-               ReferencedContainer = "container:MM-MPI-P.xcodeproj">
+               BlueprintIdentifier = "0B110F19229AF20A0019C5EA"
+               BuildableName = "MM-MPI-MP-25399"
+               BlueprintName = "MM-MPI-MP"
+               ReferencedContainer = "container:MM-MPI-MP.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-            BuildableName = "MM-MPI-P-19364"
+            BuildableName = "MM-MPI-P-1834"
             BlueprintName = "MM-MPI-P"
-            ReferencedContainer = "container:MM-MPI-P.xcodeproj">
+            ReferencedContainer = "container:../MM-MPI-P/MM-MPI-P.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -58,10 +58,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-            BuildableName = "MM-MPI-P-19364"
-            BlueprintName = "MM-MPI-P"
-            ReferencedContainer = "container:MM-MPI-P.xcodeproj">
+            BlueprintIdentifier = "0B110F19229AF20A0019C5EA"
+            BuildableName = "MM-MPI-MP-25399"
+            BlueprintName = "MM-MPI-MP"
+            ReferencedContainer = "container:MM-MPI-MP.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <CommandLineArguments>
@@ -70,15 +70,19 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-x OMP_NUM_THREADS"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "--verbose"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-c 9"
+            argument = "-c 4"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--host 10.0.0.1:1,10.0.0.29:2,10.0.0.124:2,10.0.0.75:2,10.0.0.116:2"
+            argument = "--host 10.0.0.1:1,10.0.0.29:1,10.0.0.124:1,10.0.0.75:1,10.0.0.116:1"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
@@ -98,6 +102,13 @@
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "OMP_NUM_THREADS"
+            value = "2"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -107,16 +118,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-            BuildableName = "MM-MPI-P-19364"
-            BlueprintName = "MM-MPI-P"
-            ReferencedContainer = "container:MM-MPI-P.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
