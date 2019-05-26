@@ -14,10 +14,9 @@
 
 using namespace std;
 
-#define MATRIX_SIZE 18
-#define MAX_VALUE 10UL
+#define MATRIX_SIZE 1000
+#define MAX_VALUE 1'000'000UL
 #define matrix unsigned long long
-//#define THREADS_TO_USE 8
 
 matrix *matrixA;
 matrix *matrixB;
@@ -36,47 +35,65 @@ void generateMatrices() {
   }
 }
 
-void multiplyMatrices(int worldRank, int worldSize) {
-//  if (worldRank != 0) return;
-//
-//  bool canContinue = false;
-//  while (!canContinue) {
-//  }
+static void loadBalance(int &from, int &to, int &bufferSize, int worldRank, int worldSize) {
+  int maxChunkSize = max(MATRIX_SIZE / worldSize, 0);
+  from = maxChunkSize * worldRank;
+  to = (worldRank + 1) == worldSize ? MATRIX_SIZE : maxChunkSize * (worldRank + 1);
+  int rowsToMultiply = to-from;
+  bufferSize = rowsToMultiply*MATRIX_SIZE;
+}
+
+static void createGathervDistribution(int *&displs, int *&recvCounts, int worldSize, bool shouldPrint) {
+  recvCounts = (int*)calloc(worldSize, sizeof(int));
+  displs = (int*)calloc(worldSize, sizeof(int));
   
+  int accumulatedBufferSize = 0;
+  
+  for (int worldRank = 0; worldRank < worldSize; worldRank++) {
+    int from, to, bufferSize;
+    loadBalance(from, to, bufferSize, worldRank, worldSize);
+    
+    if (shouldPrint) printf("[MM] Buffer Size: %i, Accum. Buffer Size: %i, From: %i, To: %i\n", bufferSize, accumulatedBufferSize, from, to);
+    
+    recvCounts[worldRank] = bufferSize;
+    displs[worldRank] = accumulatedBufferSize;
+    
+    accumulatedBufferSize += bufferSize;
+  }
+}
+
+void multiplyMatrices(int worldRank, int worldSize) {
   matrix *matrixBuffer;
   int row, column, offset;
+  int from;
+  int to;
+  int bufferSize;
   
-  int maxChunkSize = max(MATRIX_SIZE / worldSize, 1);
-  int from = maxChunkSize * worldRank;
+  loadBalance(from, to, bufferSize, worldRank, worldSize);
   
-  if (from > MATRIX_SIZE - 1) {
+  int * recvCounts;
+  int * displs;
+  createGathervDistribution(displs, recvCounts, worldSize, 0 == worldRank);
+  
+  if (0 == bufferSize) {
     printf("[MM] Thread ID: %i, unneeded.\n", worldRank);
-    return;
-  }
+  } else {
   
-  int to = (worldRank + 1) == worldSize ? MATRIX_SIZE : maxChunkSize * (worldRank + 1);
-  int rowsToMultiply = to-from;
-  int bufferSize = rowsToMultiply*MATRIX_SIZE;
-  
-  matrixBuffer = (matrix*)calloc(bufferSize, sizeof(matrix));
-  
-  printf("[MM] World Rank: %i, Buffer Size: %i, Rows: %i, From: %i, To: %i\n", worldRank, bufferSize, rowsToMultiply, from, to-1);
-  
-  for (row = from; row < to; row++) {
-    int index = row-from;
-//    printf("[MM] World Rank: %i, Row: %i, Index: %i\n", worldRank, row, index);
-    for (column = 0; column < MATRIX_SIZE; column++) {
-      int bufferIndex = column+(index*MATRIX_SIZE);
-//      printf("[MM] World Rank: %i, Buffer Index: %i, Row: %i, Index: %i, Column: %i\n", worldRank, bufferIndex, row, index, column);
-      matrixBuffer[bufferIndex] = 0;
-      for (offset = 0; offset < MATRIX_SIZE; offset++) {
-        matrixBuffer[bufferIndex] += matrixA[column+(offset*MATRIX_SIZE)] * matrixB[offset+(row*MATRIX_SIZE)];
+    matrixBuffer = (matrix*)calloc(bufferSize, sizeof(matrix));
+    
+    for (row = from; row < to; row++) {
+      int index = row-from;
+      for (column = 0; column < MATRIX_SIZE; column++) {
+        int bufferIndex = column+(index*MATRIX_SIZE);
+        matrixBuffer[bufferIndex] = 0;
+        for (offset = 0; offset < MATRIX_SIZE; offset++) {
+          matrixBuffer[bufferIndex] += matrixA[column+(offset*MATRIX_SIZE)] * matrixB[offset+(row*MATRIX_SIZE)];
+        }
       }
     }
   }
   
-//  MPI_Barrier(MPI_COMM_WORLD);
-  MPI_Gather(matrixBuffer, bufferSize, MPI_UNSIGNED_LONG_LONG, matrixC, bufferSize, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
+  MPI_Gatherv(matrixBuffer, recvCounts[worldRank], MPI_UNSIGNED_LONG_LONG, matrixC, recvCounts, displs, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
 }
 
 void writeMatriceToDisk(string name, matrix matrice[MATRIX_SIZE], ofstream *outputFileStream) {
@@ -176,15 +193,16 @@ int main(int argc, const char * argv[]) {
   
   printf("Broadcast Matrices: %.3fs\n", durationBetweenTimers());
   
-  startTimer();
+  if (worldRank == 0) startTimer();
   
   multiplyMatrices(worldRank, worldSize);
   
-  stopTimer();
-  
-  printf("Multiply Matrices: %.3fs\n", durationBetweenTimers());
-  
   MPI_Barrier(MPI_COMM_WORLD);
+  
+  if (worldRank == 0) {
+    stopTimer();
+    printf("Multiply Matrices: %.3fs\n", durationBetweenTimers());
+  }
   
   if (worldRank == 0) {
     startTimer();
