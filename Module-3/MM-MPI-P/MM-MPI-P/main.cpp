@@ -14,10 +14,10 @@
 
 using namespace std;
 
-#define MATRIX_SIZE 20
+#define MATRIX_SIZE 18
 #define MAX_VALUE 10UL
 #define matrix unsigned long long
-#define THREADS_TO_USE 8
+//#define THREADS_TO_USE 8
 
 matrix *matrixA;
 matrix *matrixB;
@@ -36,30 +36,47 @@ void generateMatrices() {
   }
 }
 
-void multiplyMatrices(int threadId) {
+void multiplyMatrices(int worldRank, int worldSize) {
+//  if (worldRank != 0) return;
+//
+//  bool canContinue = false;
+//  while (!canContinue) {
+//  }
+  
+  matrix *matrixBuffer;
   int row, column, offset;
   
-  int chunkSize = max(MATRIX_SIZE / THREADS_TO_USE, 1);
-  int from = chunkSize * threadId;
+  int maxChunkSize = max(MATRIX_SIZE / worldSize, 1);
+  int from = maxChunkSize * worldRank;
   
   if (from > MATRIX_SIZE - 1) {
-    printf("Thread ID: %i, unneeded.\n", threadId);
+    printf("[MM] Thread ID: %i, unneeded.\n", worldRank);
     return;
   }
   
-  int to = (threadId + 1) == THREADS_TO_USE ? MATRIX_SIZE : chunkSize * (threadId + 1);
+  int to = (worldRank + 1) == worldSize ? MATRIX_SIZE : maxChunkSize * (worldRank + 1);
+  int rowsToMultiply = to-from;
+  int bufferSize = rowsToMultiply*MATRIX_SIZE;
   
-  printf("Thread ID: %i, From: %i, To: %i\n", threadId, from, to-1);
+  matrixBuffer = (matrix*)calloc(bufferSize, sizeof(matrix));
+  
+  printf("[MM] World Rank: %i, Buffer Size: %i, Rows: %i, From: %i, To: %i\n", worldRank, bufferSize, rowsToMultiply, from, to-1);
   
   for (row = from; row < to; row++) {
+    int index = row-from;
+    printf("[MM] World Rank: %i, Row: %i, Index: %i\n", worldRank, row, index);
     for (column = 0; column < MATRIX_SIZE; column++) {
+      int bufferIndex = column+(index*MATRIX_SIZE);
+      printf("[MM] World Rank: %i, Buffer Index: %i, Row: %i, Index: %i, Column: %i\n", worldRank, bufferIndex, row, index, column);
+      matrixBuffer[bufferIndex] = 0;
       for (offset = 0; offset < MATRIX_SIZE; offset++) {
-        matrixC[row+(column*MATRIX_SIZE)] += matrixA[row+(offset*MATRIX_SIZE)] * matrixB[offset+(column*MATRIX_SIZE)];
+        matrixBuffer[bufferIndex] += matrixA[row+(offset*MATRIX_SIZE)] * matrixB[offset+(column*MATRIX_SIZE)];
       }
     }
   }
   
-  return;
+  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Gather(matrixBuffer, bufferSize, MPI_UNSIGNED_LONG_LONG, matrixC, bufferSize, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
 }
 
 void writeMatriceToDisk(string name, matrix matrice[MATRIX_SIZE], ofstream *outputFileStream) {
@@ -83,7 +100,7 @@ void writeMatriceToDisk(string name, matrix matrice[MATRIX_SIZE], ofstream *outp
 }
 
 void writeMatricesToDisk() {
-  ofstream outputFileStream("MM-MPI-P.txt");
+  ofstream outputFileStream("/Volumes/Shared Folders/Module-3/DerivedData/MPI Matrix Multiplication/Build/Products/Debug/MM-MPI-P.txt");
   
   if (outputFileStream.is_open()) {
     writeMatriceToDisk("A", matrixA, &outputFileStream);
@@ -120,6 +137,20 @@ int main(int argc, const char * argv[]) {
 //  srand((int)time(NULL));
   srand(0);
   
+  MPI_Init(NULL, NULL);
+
+  int worldSize = 0;
+  MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
+
+  int worldRank = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &worldRank);
+
+  char processorName[MPI_MAX_PROCESSOR_NAME];
+  int nameLen;
+  MPI_Get_processor_name(processorName, &nameLen);
+
+  printf("Processor: %s, rank: %d out of %d processors\n", processorName, worldRank, worldSize);
+  
   printThreadInfo();
   
   startTimer();
@@ -128,7 +159,7 @@ int main(int argc, const char * argv[]) {
   matrixB = (matrix*)calloc(MATRIX_SIZE*MATRIX_SIZE, sizeof(matrix));
   matrixC = (matrix*)calloc(MATRIX_SIZE*MATRIX_SIZE, sizeof(matrix));
   
-  generateMatrices();
+  if (worldRank == 0) generateMatrices();
   
   stopTimer();
   
@@ -136,27 +167,37 @@ int main(int argc, const char * argv[]) {
   
   startTimer();
   
-  thread threads[THREADS_TO_USE];
+  MPI_Bcast(matrixA, MATRIX_SIZE*MATRIX_SIZE, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
+  MPI_Bcast(matrixB, MATRIX_SIZE*MATRIX_SIZE, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
   
-  for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
-    threads[threadId] = thread(multiplyMatrices, threadId);
-  }
+  MPI_Barrier(MPI_COMM_WORLD);
   
-  for (int threadId = 0; threadId < THREADS_TO_USE; threadId++) {
-    threads[threadId].join();
-  }
+  stopTimer();
+  
+  printf("Broadcast Matrices: %.3fs\n", durationBetweenTimers());
+  
+  startTimer();
+  
+  multiplyMatrices(worldRank, worldSize);
   
   stopTimer();
   
   printf("Multiply Matrices: %.3fs\n", durationBetweenTimers());
   
-  startTimer();
+  MPI_Barrier(MPI_COMM_WORLD);
   
-  writeMatricesToDisk();
+  if (worldRank == 0) {
+    startTimer();
+    
+    writeMatricesToDisk();
+    
+    stopTimer();
+    
+    printf("Write Output: %.3fs\n", durationBetweenTimers());
+  }
   
-  stopTimer();
-  
-  printf("Write Output: %.3fs\n", durationBetweenTimers());
+  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Finalize();
   
   return 0;
 }
