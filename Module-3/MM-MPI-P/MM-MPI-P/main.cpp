@@ -64,18 +64,18 @@ void multiplyMatrices(int worldRank, int worldSize) {
   
   for (row = from; row < to; row++) {
     int index = row-from;
-    printf("[MM] World Rank: %i, Row: %i, Index: %i\n", worldRank, row, index);
+//    printf("[MM] World Rank: %i, Row: %i, Index: %i\n", worldRank, row, index);
     for (column = 0; column < MATRIX_SIZE; column++) {
       int bufferIndex = column+(index*MATRIX_SIZE);
-      printf("[MM] World Rank: %i, Buffer Index: %i, Row: %i, Index: %i, Column: %i\n", worldRank, bufferIndex, row, index, column);
+//      printf("[MM] World Rank: %i, Buffer Index: %i, Row: %i, Index: %i, Column: %i\n", worldRank, bufferIndex, row, index, column);
       matrixBuffer[bufferIndex] = 0;
       for (offset = 0; offset < MATRIX_SIZE; offset++) {
-        matrixBuffer[bufferIndex] += matrixA[row+(offset*MATRIX_SIZE)] * matrixB[offset+(column*MATRIX_SIZE)];
+        matrixBuffer[bufferIndex] += matrixA[column+(offset*MATRIX_SIZE)] * matrixB[offset+(row*MATRIX_SIZE)];
       }
     }
   }
   
-  MPI_Barrier(MPI_COMM_WORLD);
+//  MPI_Barrier(MPI_COMM_WORLD);
   MPI_Gather(matrixBuffer, bufferSize, MPI_UNSIGNED_LONG_LONG, matrixC, bufferSize, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
 }
 
