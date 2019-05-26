@@ -19,9 +19,9 @@ using namespace std;
 #define matrix unsigned long long
 #define THREADS_TO_USE 8
 
-matrix matrixA[MATRIX_SIZE*MATRIX_SIZE];
-matrix matrixB[MATRIX_SIZE*MATRIX_SIZE];
-matrix matrixC[MATRIX_SIZE*MATRIX_SIZE];
+matrix *matrixA;
+matrix *matrixB;
+matrix *matrixC;
 
 struct timespec startTimespec, endTimespec;
 
@@ -83,7 +83,7 @@ void writeMatriceToDisk(string name, matrix matrice[MATRIX_SIZE], ofstream *outp
 }
 
 void writeMatricesToDisk() {
-  ofstream outputFileStream("MM-Parallel.txt");
+  ofstream outputFileStream("MM-MPI-P.txt");
   
   if (outputFileStream.is_open()) {
     writeMatriceToDisk("A", matrixA, &outputFileStream);
@@ -123,6 +123,10 @@ int main(int argc, const char * argv[]) {
   printThreadInfo();
   
   startTimer();
+  
+  matrixA = (matrix*)calloc(MATRIX_SIZE*MATRIX_SIZE, sizeof(matrix));
+  matrixB = (matrix*)calloc(MATRIX_SIZE*MATRIX_SIZE, sizeof(matrix));
+  matrixC = (matrix*)calloc(MATRIX_SIZE*MATRIX_SIZE, sizeof(matrix));
   
   generateMatrices();
   
