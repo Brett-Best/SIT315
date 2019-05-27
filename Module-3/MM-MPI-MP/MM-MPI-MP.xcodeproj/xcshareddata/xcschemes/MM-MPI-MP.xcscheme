@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0B110F19229AF20A0019C5EA"
-               BuildableName = "MM-MPI-MP-25399"
+               BuildableName = "MM-MPI-MP-7109"
                BlueprintName = "MM-MPI-MP"
                ReferencedContainer = "container:MM-MPI-MP.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-            BuildableName = "MM-MPI-P-1834"
+            BuildableName = "MM-MPI-P-15340"
             BlueprintName = "MM-MPI-P"
             ReferencedContainer = "container:../MM-MPI-P/MM-MPI-P.xcodeproj">
          </BuildableReference>
@@ -59,7 +59,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0B110F19229AF20A0019C5EA"
-            BuildableName = "MM-MPI-MP-25399"
+            BuildableName = "MM-MPI-MP-7109"
             BlueprintName = "MM-MPI-MP"
             ReferencedContainer = "container:MM-MPI-MP.xcodeproj">
          </BuildableReference>

@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-               BuildableName = "MM-MPI-P-15340"
-               BlueprintName = "MM-MPI-P"
-               ReferencedContainer = "container:MM-MPI-P.xcodeproj">
+               BlueprintIdentifier = "0B295CCC229C0AD0007310BC"
+               BuildableName = "MM-MPI-CL"
+               BlueprintName = "MM-MPI-CL"
+               ReferencedContainer = "container:MM-MPI-CL.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-            BuildableName = "MM-MPI-P-15340"
-            BlueprintName = "MM-MPI-P"
-            ReferencedContainer = "container:MM-MPI-P.xcodeproj">
+            BlueprintIdentifier = "0B295CCC229C0AD0007310BC"
+            BuildableName = "MM-MPI-CL"
+            BlueprintName = "MM-MPI-CL"
+            ReferencedContainer = "container:MM-MPI-CL.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -51,53 +51,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <PathRunnable
-         runnableDebuggingMode = "0"
-         FilePath = "/usr/local/Cellar/open-mpi/4.0.1_1/bin/orterun">
-      </PathRunnable>
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-            BuildableName = "MM-MPI-P-15340"
-            BlueprintName = "MM-MPI-P"
-            ReferencedContainer = "container:MM-MPI-P.xcodeproj">
+            BlueprintIdentifier = "0B295CCC229C0AD0007310BC"
+            BuildableName = "MM-MPI-CL"
+            BlueprintName = "MM-MPI-CL"
+            ReferencedContainer = "container:MM-MPI-CL.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "--use-hwthread-cpus"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--verbose"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-c 9"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--host 10.0.0.1:1,10.0.0.29:2,10.0.0.124:2,10.0.0.75:2,10.0.0.116:2"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--mca orte_tmpdir_base /tmp"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--mca orte_base_help_aggregate 0"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--path &quot;/Volumes/Shared Folders/Module-3/DerivedData/MPI Matrix Multiplication/Build/Products/Debug/&quot;"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "$(PRODUCT_NAME)"
-            isEnabled = "YES">
-         </CommandLineArgument>
-      </CommandLineArguments>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -111,10 +74,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0B5E8AD72299643E007F7DC0"
-            BuildableName = "MM-MPI-P-15340"
-            BlueprintName = "MM-MPI-P"
-            ReferencedContainer = "container:MM-MPI-P.xcodeproj">
+            BlueprintIdentifier = "0B295CCC229C0AD0007310BC"
+            BuildableName = "MM-MPI-CL"
+            BlueprintName = "MM-MPI-CL"
+            ReferencedContainer = "container:MM-MPI-CL.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

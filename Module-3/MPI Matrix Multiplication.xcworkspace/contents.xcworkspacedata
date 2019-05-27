@@ -7,4 +7,7 @@
    <FileRef
       location = "group:MM-MPI-MP/MM-MPI-MP.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:MM-MPI-CL/MM-MPI-CL.xcodeproj">
+   </FileRef>
 </Workspace>
