@@ -29,6 +29,26 @@ matrix *matrixC;
 
 struct timespec startTimespec, endTimespec;
 
+cl_device_id openCLDeviceID;
+cl_context openCLContext;
+cl_program openCLProgram;
+cl_kernel openCLKernel;
+cl_command_queue openCLCommandQueue;
+
+cl_event openCLEvent = NULL;
+int openCLError;
+
+cl_mem matrixABuffer, matrixBBuffer, matrixCBuffer;
+const int matrixSize = MATRIX_SIZE;
+
+cl_device_id createOpenCLDevice();
+cl_program createOpenCLProgram(cl_context ctx, cl_device_id dev, const char* filename);
+
+void setupOpenCLDeviceContextQueueKernel();
+void configureKernalMemory(matrix *matrixBuffer, int matrixBufferSize);
+void setKernelArgs(int from);
+void releaseOpenCLComponents();
+
 void generateMatrices() {
   int row, column;
 
@@ -85,20 +105,34 @@ void multiplyMatrices(int worldRank, int worldSize) {
   } else {
 
     matrixBuffer = (matrix*)calloc(bufferSize, sizeof(matrix));
-
-    for (row = from; row < to; row++) {
-      int index = row-from;
-      for (column = 0; column < MATRIX_SIZE; column++) {
-        int bufferIndex = column+(index*MATRIX_SIZE);
-        matrixBuffer[bufferIndex] = 0;
-        for (offset = 0; offset < MATRIX_SIZE; offset++) {
-          matrixBuffer[bufferIndex] += matrixA[column+(offset*MATRIX_SIZE)] * matrixB[offset+(row*MATRIX_SIZE)];
-        }
-      }
+    
+    setupOpenCLDeviceContextQueueKernel();
+    configureKernalMemory(matrixBuffer, bufferSize*sizeof(matrix));
+    setKernelArgs(from);
+    
+    const int TS = 4;
+    const size_t local[2] = { TS, TS };
+    const size_t x = to-from;
+    const size_t global[2] = { x , matrixSize };
+    
+    printf("X = %zu\n", x);
+    
+    clEnqueueNDRangeKernel(openCLCommandQueue, openCLKernel, 2, NULL, global, local, 0, NULL, &openCLEvent);
+    
+    if (NULL == openCLEvent) {
+      printf("\n\nNULL OPEN CL EVENT\n\n");
     }
+    
+    clWaitForEvents(1, &openCLEvent);
+    
+    //copying data from the device back to host c matrix
+    clEnqueueReadBuffer(openCLCommandQueue, matrixCBuffer, CL_TRUE, 0, bufferSize*sizeof(matrix), matrixBuffer, 0, NULL, NULL);
+    
+    releaseOpenCLComponents();
+    
   }
-
-  MPI_Gatherv(matrixBuffer, recvCounts[worldRank], MPI_UNSIGNED_LONG_LONG, matrixC, recvCounts, displs, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
+  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Gatherv(matrixBuffer, recvCounts[worldRank], MPI_INT, matrixC, recvCounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
 }
 
 void writeMatriceToDisk(string name, matrix matrice[MATRIX_SIZE], ofstream *outputFileStream) {
@@ -155,29 +189,6 @@ double durationBetweenTimers() {
   return seconds;
 }
 
-cl_device_id openCLDeviceID;
-cl_context openCLContext;
-cl_program openCLProgram;
-cl_kernel openCLKernel;
-cl_command_queue openCLCommandQueue;
-
-cl_event openCLEvent = NULL;
-int openCLError;
-
-cl_mem matrixABuffer, matrixBBuffer, matrixCBuffer;
-const int matrixSize = MATRIX_SIZE;
-const int TS = 4;
-const size_t local[2] = { TS, TS };
-const size_t global[2] = { matrixSize, matrixSize };
-
-cl_device_id createOpenCLDevice();
-cl_program createOpenCLProgram(cl_context ctx, cl_device_id dev, const char* filename);
-
-void setupOpenCLDeviceContextQueueKernel();
-void configureKernalMemory();
-void setKernelArgs();
-void releaseOpenCLComponents();
-
 int main() {
 //    srand((int)time(NULL));
   srand(0);
@@ -219,43 +230,20 @@ int main() {
 
   stopTimer();
 
-  printf("Broadcast Matrices: %.3fs\n", durationBetweenTimers());
+//  printf("Broadcast Matrices: %.3fs\n", durationBetweenTimers());
 
-//  if (worldRank == 0) startTimer();
-//
-//  multiplyMatrices(worldRank, worldSize);
-//
-//  MPI_Barrier(MPI_COMM_WORLD);
-//
-//  if (worldRank == 0) {
-//    stopTimer();
-//    printf("Multiply Matrices: %.3fs\n", durationBetweenTimers());
-//  }
+  if (worldRank == 0) startTimer();
 
-  //////
+  MPI_Barrier(MPI_COMM_WORLD);
+  
+  multiplyMatrices(worldRank, worldSize);
+
+  MPI_Barrier(MPI_COMM_WORLD);
 
   if (worldRank == 0) {
-
-    setupOpenCLDeviceContextQueueKernel();
-    configureKernalMemory();
-    setKernelArgs();
-
-    clEnqueueNDRangeKernel(openCLCommandQueue, openCLKernel, 2, NULL, global, local, 0, NULL, &openCLEvent);
-
-    if (NULL == openCLEvent) {
-      printf("\n\nNULL OPEN CL EVENT\n\n");
-    }
-
-    clWaitForEvents(1, &openCLEvent);
-
-    //copying data from the device back to host c matrix
-    clEnqueueReadBuffer(openCLCommandQueue, matrixCBuffer, CL_TRUE, 0, MATRIX_SIZE * MATRIX_SIZE * sizeof(matrix), matrixC, 0, NULL, NULL);
-
-    releaseOpenCLComponents();
-
-
+    stopTimer();
+    printf("Multiply Matrices: %.3fs\n", durationBetweenTimers());
   }
-  //////
 
   if (worldRank == 0) {
     startTimer();
@@ -282,13 +270,12 @@ void releaseOpenCLComponents() {
   clReleaseContext(openCLContext);
 }
 
-void setKernelArgs() {
-  clSetKernelArg(openCLKernel, 0, sizeof(matrix), (void*)&matrixSize);
+void setKernelArgs(int from) {
+  clSetKernelArg(openCLKernel, 0, sizeof(matrix), (void*)&from);
   clSetKernelArg(openCLKernel, 1, sizeof(matrix), (void*)&matrixSize);
-  clSetKernelArg(openCLKernel, 2, sizeof(matrix), (void*)&matrixSize);
-  clSetKernelArg(openCLKernel, 3, sizeof(cl_mem), (void*)&matrixABuffer);
-  clSetKernelArg(openCLKernel, 4, sizeof(cl_mem), (void*)&matrixBBuffer);
-  clSetKernelArg(openCLKernel, 5, sizeof(cl_mem), (void*)&matrixCBuffer);
+  clSetKernelArg(openCLKernel, 2, sizeof(cl_mem), (void*)&matrixABuffer);
+  clSetKernelArg(openCLKernel, 3, sizeof(cl_mem), (void*)&matrixBBuffer);
+  clSetKernelArg(openCLKernel, 4, sizeof(cl_mem), (void*)&matrixCBuffer);
 
   if (openCLError < 0) {
     perror("Couldn't create a kernel argument");
@@ -296,15 +283,16 @@ void setKernelArgs() {
     exit(1);
   }
 }
-void configureKernalMemory() {
+
+void configureKernalMemory(matrix *matrixBuffer, int matrixBufferSize) {
   matrixABuffer = clCreateBuffer(openCLContext, CL_MEM_READ_ONLY,  MATRIX_SIZE*MATRIX_SIZE*sizeof(matrix), NULL, NULL);
   matrixBBuffer = clCreateBuffer(openCLContext, CL_MEM_READ_ONLY,  MATRIX_SIZE*MATRIX_SIZE*sizeof(matrix), NULL, NULL);
-  matrixCBuffer = clCreateBuffer(openCLContext, CL_MEM_READ_WRITE, MATRIX_SIZE*MATRIX_SIZE*sizeof(matrix), NULL, NULL);
+  matrixCBuffer = clCreateBuffer(openCLContext, CL_MEM_READ_WRITE, matrixBufferSize, NULL, NULL);
 
   // Copy matrices to the GPU
   clEnqueueWriteBuffer(openCLCommandQueue, matrixABuffer, CL_TRUE, 0, MATRIX_SIZE*MATRIX_SIZE*sizeof(matrix), matrixA, 0, NULL, NULL);
   clEnqueueWriteBuffer(openCLCommandQueue, matrixBBuffer, CL_TRUE, 0, MATRIX_SIZE*MATRIX_SIZE*sizeof(matrix), matrixB, 0, NULL, NULL);
-  clEnqueueWriteBuffer(openCLCommandQueue, matrixCBuffer, CL_TRUE, 0, MATRIX_SIZE*MATRIX_SIZE*sizeof(matrix), matrixC, 0, NULL, NULL);
+  clEnqueueWriteBuffer(openCLCommandQueue, matrixCBuffer, CL_TRUE, 0, matrixBufferSize, matrixBuffer, 0, NULL, NULL);
 }
 
 void setupOpenCLDeviceContextQueueKernel() {
