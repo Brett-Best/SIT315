@@ -20,8 +20,8 @@
 using namespace std;
 
 #define MATRIX_SIZE 32
-#define MAX_VALUE 32
-#define matrix int
+#define MAX_VALUE 100'000UL
+#define matrix unsigned long
 
 matrix *matrixA;
 matrix *matrixB;
@@ -43,6 +43,8 @@ const int matrixSize = MATRIX_SIZE;
 
 cl_device_id createOpenCLDevice();
 cl_program createOpenCLProgram(cl_context ctx, cl_device_id dev, const char* filename);
+
+bool mustUseLocalWorkSizeOf1 = false;
 
 void setupOpenCLDeviceContextQueueKernel();
 void configureKernalMemory(matrix *matrixBuffer, int matrixBufferSize);
@@ -89,12 +91,9 @@ static void createGathervDistribution(int *&displs, int *&recvCounts, int worldS
 
 void multiplyMatrices(int worldRank, int worldSize) {
   matrix *matrixBuffer;
-  int row, column, offset;
-  int from;
-  int to;
-  int bufferSize;
+  int fromRow, toRow, bufferSize;
 
-  loadBalance(from, to, bufferSize, worldRank, worldSize);
+  loadBalance(fromRow, toRow, bufferSize, worldRank, worldSize);
 
   int * recvCounts;
   int * displs;
@@ -108,31 +107,25 @@ void multiplyMatrices(int worldRank, int worldSize) {
     
     setupOpenCLDeviceContextQueueKernel();
     configureKernalMemory(matrixBuffer, bufferSize*sizeof(matrix));
-    setKernelArgs(from);
+    setKernelArgs(fromRow);
     
-    const int TS = 4;
+    const size_t rowsToProcess = toRow-fromRow;
+    const size_t global[2] = { rowsToProcess , matrixSize };
+    
+    const size_t TS = mustUseLocalWorkSizeOf1 ? 1 : (0 == MATRIX_SIZE % 4 && 0 == rowsToProcess % 4) ? 4 : (0 == MATRIX_SIZE % 2 && 0 == rowsToProcess % 2) ? 2 : 1;
     const size_t local[2] = { TS, TS };
-    const size_t x = to-from;
-    const size_t global[2] = { x , matrixSize };
-    
-    printf("X = %zu\n", x);
     
     clEnqueueNDRangeKernel(openCLCommandQueue, openCLKernel, 2, NULL, global, local, 0, NULL, &openCLEvent);
-    
-    if (NULL == openCLEvent) {
-      printf("\n\nNULL OPEN CL EVENT\n\n");
-    }
-    
     clWaitForEvents(1, &openCLEvent);
     
-    //copying data from the device back to host c matrix
+    // Copy data from the device back to the matrix buffer (NB: not the CL matrix buffer)
     clEnqueueReadBuffer(openCLCommandQueue, matrixCBuffer, CL_TRUE, 0, bufferSize*sizeof(matrix), matrixBuffer, 0, NULL, NULL);
     
     releaseOpenCLComponents();
     
   }
-  MPI_Barrier(MPI_COMM_WORLD);
-  MPI_Gatherv(matrixBuffer, recvCounts[worldRank], MPI_INT, matrixC, recvCounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
+  
+  MPI_Gatherv(matrixBuffer, recvCounts[worldRank], MPI_UNSIGNED_LONG, matrixC, recvCounts, displs, MPI_UNSIGNED_LONG, 0, MPI_COMM_WORLD);
 }
 
 void writeMatriceToDisk(string name, matrix matrice[MATRIX_SIZE], ofstream *outputFileStream) {
@@ -230,11 +223,9 @@ int main() {
 
   stopTimer();
 
-//  printf("Broadcast Matrices: %.3fs\n", durationBetweenTimers());
+  printf("Broadcast Matrices: %.3fs\n", durationBetweenTimers());
 
   if (worldRank == 0) startTimer();
-
-  MPI_Barrier(MPI_COMM_WORLD);
   
   multiplyMatrices(worldRank, worldSize);
 
@@ -313,7 +304,7 @@ void setupOpenCLDeviceContextQueueKernel() {
     exit(1);
   }
 
-  openCLKernel = clCreateKernel(openCLProgram, "multiply_matrices", &err);
+  openCLKernel = clCreateKernel(openCLProgram, "multiplyMatrices", &err);
 
   if (err < 0) {
     perror("Couldn't create a kernel");
@@ -395,16 +386,17 @@ cl_device_id createOpenCLDevice() {
   err = clGetPlatformIDs(1, &platform, NULL);
   if(err < 0) {
     perror("Couldn't identify a platform");
-    exit(1);
   }
 
   // Access a device
   // GPU
-//  clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &dev, NULL);
-//  if(err == CL_DEVICE_NOT_FOUND) {
-    //CPU
-    err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &dev, NULL);
-//  }
+  err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &dev, NULL);
+  if(err == CL_DEVICE_NOT_FOUND) {
+    // CPU
+    mustUseLocalWorkSizeOf1 = true; // Using the CPU with work sizes greater than 1 didn't work on my computer.
+    err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &dev, NULL);
+  }
+  
   if(err < 0) {
     perror("Couldn't access any devices");
     exit(1);

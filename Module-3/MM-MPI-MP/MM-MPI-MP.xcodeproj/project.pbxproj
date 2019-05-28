@@ -25,7 +25,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0B110F1A229AF20A0019C5EA /* MM-MPI-MP-7109 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "MM-MPI-MP-7109"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B110F1A229AF20A0019C5EA /* MM-MPI-MP-6690 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "MM-MPI-MP-6690"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B110F1D229AF20A0019C5EA /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0B110F25229AF2950019C5EA /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		0B110F27229AF2C40019C5EA /* libmpi.40.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.40.dylib; path = "../../../../../../usr/local/Cellar/open-mpi/4.0.1_1/lib/libmpi.40.dylib"; sourceTree = "<group>"; };
@@ -57,7 +57,7 @@
 		0B110F1B229AF20A0019C5EA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0B110F1A229AF20A0019C5EA /* MM-MPI-MP-7109 */,
+				0B110F1A229AF20A0019C5EA /* MM-MPI-MP-6690 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -98,7 +98,7 @@
 			);
 			name = "MM-MPI-MP";
 			productName = "MM-MPI-MP";
-			productReference = 0B110F1A229AF20A0019C5EA /* MM-MPI-MP-7109 */;
+			productReference = 0B110F1A229AF20A0019C5EA /* MM-MPI-MP-6690 */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */

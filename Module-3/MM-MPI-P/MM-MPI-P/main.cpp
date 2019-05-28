@@ -14,9 +14,9 @@
 
 using namespace std;
 
-#define MATRIX_SIZE 1000
-#define MAX_VALUE 1'000'000UL
-#define matrix unsigned long long
+#define MATRIX_SIZE 32
+#define MAX_VALUE 100'000UL
+#define matrix unsigned long
 
 matrix *matrixA;
 matrix *matrixB;
@@ -93,7 +93,7 @@ void multiplyMatrices(int worldRank, int worldSize) {
     }
   }
   
-  MPI_Gatherv(matrixBuffer, recvCounts[worldRank], MPI_UNSIGNED_LONG_LONG, matrixC, recvCounts, displs, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
+  MPI_Gatherv(matrixBuffer, recvCounts[worldRank], MPI_UNSIGNED_LONG, matrixC, recvCounts, displs, MPI_UNSIGNED_LONG, 0, MPI_COMM_WORLD);
 }
 
 void writeMatriceToDisk(string name, matrix matrice[MATRIX_SIZE], ofstream *outputFileStream) {

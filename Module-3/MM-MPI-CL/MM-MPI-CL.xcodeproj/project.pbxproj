@@ -27,7 +27,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0B295CCD229C0AD0007310BC /* MM-MPI-CL-5319 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "MM-MPI-CL-5319"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B295CCD229C0AD0007310BC /* MM-MPI-CL-11888 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "MM-MPI-CL-11888"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B295CD0229C0AD0007310BC /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0B295CD8229C0AE7007310BC /* libmpi.40.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.40.dylib; path = "../../../../../../usr/local/Cellar/open-mpi/4.0.1_1/lib/libmpi.40.dylib"; sourceTree = "<group>"; };
 		0B295CDA229C0AEE007310BC /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
@@ -60,7 +60,7 @@
 		0B295CCE229C0AD0007310BC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0B295CCD229C0AD0007310BC /* MM-MPI-CL-5319 */,
+				0B295CCD229C0AD0007310BC /* MM-MPI-CL-11888 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,7 +102,7 @@
 			);
 			name = "MM-MPI-CL";
 			productName = "MM-MPI-CL";
-			productReference = 0B295CCD229C0AD0007310BC /* MM-MPI-CL-5319 */;
+			productReference = 0B295CCD229C0AD0007310BC /* MM-MPI-CL-11888 */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
