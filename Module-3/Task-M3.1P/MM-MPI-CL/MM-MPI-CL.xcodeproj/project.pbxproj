@@ -3,73 +3,83 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0B1F4AAF225BB312004B6293 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B1F4AAE225BB312004B6293 /* main.cpp */; };
-		0B6AFF8C225FC6E800E763DC /* libomp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B6AFF8B225FC6E800E763DC /* libomp.dylib */; };
+		0B295CD1229C0AD0007310BC /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B295CD0229C0AD0007310BC /* main.cpp */; };
+		0B295CD9229C0AE7007310BC /* libmpi.40.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B295CD8229C0AE7007310BC /* libmpi.40.dylib */; };
+		0B295CDB229C0AEE007310BC /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B295CDA229C0AEE007310BC /* OpenCL.framework */; };
+		0B295CE0229C2A1D007310BC /* matrix_mul.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0B295CDE229C28E8007310BC /* matrix_mul.cl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		0B1F4AA9225BB312004B6293 /* CopyFiles */ = {
+		0B295CCB229C0AD0007310BC /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
 			files = (
+				0B295CE0229C2A1D007310BC /* matrix_mul.cl in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0B1F4AAB225BB312004B6293 /* Matrix Multiplication - OpenMP */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Matrix Multiplication - OpenMP"; sourceTree = BUILT_PRODUCTS_DIR; };
-		0B1F4AAE225BB312004B6293 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		0B6AFF8B225FC6E800E763DC /* libomp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libomp.dylib; path = /usr/local/Cellar/llvm/8.0.0/lib/libomp.dylib; sourceTree = "<group>"; };
+		0B295CCD229C0AD0007310BC /* MM-MPI-CL-11888 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "MM-MPI-CL-11888"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B295CD0229C0AD0007310BC /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		0B295CD8229C0AE7007310BC /* libmpi.40.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.40.dylib; path = "../../../../../../usr/local/Cellar/open-mpi/4.0.1_1/lib/libmpi.40.dylib"; sourceTree = "<group>"; };
+		0B295CDA229C0AEE007310BC /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
+		0B295CDD229C0C1C007310BC /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		0B295CDE229C28E8007310BC /* matrix_mul.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = matrix_mul.cl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		0B1F4AA8225BB312004B6293 /* Frameworks */ = {
+		0B295CCA229C0AD0007310BC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0B6AFF8C225FC6E800E763DC /* libomp.dylib in Frameworks */,
+				0B295CDB229C0AEE007310BC /* OpenCL.framework in Frameworks */,
+				0B295CD9229C0AE7007310BC /* libmpi.40.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0B1F4AA2225BB312004B6293 = {
+		0B295CC4229C0AD0007310BC = {
 			isa = PBXGroup;
 			children = (
-				0B1F4AAD225BB312004B6293 /* Matrix Multiplication - OpenMP */,
-				0B1F4AAC225BB312004B6293 /* Products */,
-				0B6AFF8A225FC6E700E763DC /* Frameworks */,
+				0B295CCF229C0AD0007310BC /* MM-MPI-CL */,
+				0B295CCE229C0AD0007310BC /* Products */,
+				0B295CD7229C0AE7007310BC /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
-		0B1F4AAC225BB312004B6293 /* Products */ = {
+		0B295CCE229C0AD0007310BC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0B1F4AAB225BB312004B6293 /* Matrix Multiplication - OpenMP */,
+				0B295CCD229C0AD0007310BC /* MM-MPI-CL-11888 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		0B1F4AAD225BB312004B6293 /* Matrix Multiplication - OpenMP */ = {
+		0B295CCF229C0AD0007310BC /* MM-MPI-CL */ = {
 			isa = PBXGroup;
 			children = (
-				0B1F4AAE225BB312004B6293 /* main.cpp */,
+				0B295CD0229C0AD0007310BC /* main.cpp */,
+				0B295CDE229C28E8007310BC /* matrix_mul.cl */,
+				0B295CDD229C0C1C007310BC /* Config.xcconfig */,
 			);
-			path = "Matrix Multiplication - OpenMP";
+			path = "MM-MPI-CL";
 			sourceTree = "<group>";
 		};
-		0B6AFF8A225FC6E700E763DC /* Frameworks */ = {
+		0B295CD7229C0AE7007310BC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				0B6AFF8B225FC6E800E763DC /* libomp.dylib */,
+				0B295CDA229C0AEE007310BC /* OpenCL.framework */,
+				0B295CD8229C0AE7007310BC /* libmpi.40.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -77,68 +87,91 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0B1F4AAA225BB312004B6293 /* Matrix Multiplication - OpenMP */ = {
+		0B295CCC229C0AD0007310BC /* MM-MPI-CL */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0B1F4AB2225BB312004B6293 /* Build configuration list for PBXNativeTarget "Matrix Multiplication - OpenMP" */;
+			buildConfigurationList = 0B295CD4229C0AD0007310BC /* Build configuration list for PBXNativeTarget "MM-MPI-CL" */;
 			buildPhases = (
-				0B1F4AA7225BB312004B6293 /* Sources */,
-				0B1F4AA8225BB312004B6293 /* Frameworks */,
-				0B1F4AA9225BB312004B6293 /* CopyFiles */,
+				0B295CC9229C0AD0007310BC /* Sources */,
+				0B295CCA229C0AD0007310BC /* Frameworks */,
+				0B295CCB229C0AD0007310BC /* CopyFiles */,
+				0B295CDC229C0B7D007310BC /* Random Product Name */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "Matrix Multiplication - OpenMP";
-			productName = "Matrix Multiplication - OpenMP";
-			productReference = 0B1F4AAB225BB312004B6293 /* Matrix Multiplication - OpenMP */;
+			name = "MM-MPI-CL";
+			productName = "MM-MPI-CL";
+			productReference = 0B295CCD229C0AD0007310BC /* MM-MPI-CL-11888 */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		0B1F4AA3225BB312004B6293 /* Project object */ = {
+		0B295CC5229C0AD0007310BC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "Brett Best";
 				TargetAttributes = {
-					0B1F4AAA225BB312004B6293 = {
-						CreatedOnToolsVersion = 10.2;
+					0B295CCC229C0AD0007310BC = {
+						CreatedOnToolsVersion = 10.2.1;
 					};
 				};
 			};
-			buildConfigurationList = 0B1F4AA6225BB312004B6293 /* Build configuration list for PBXProject "Matrix Multiplication - OpenMP" */;
-			compatibilityVersion = "Xcode 10.0";
+			buildConfigurationList = 0B295CC8229C0AD0007310BC /* Build configuration list for PBXProject "MM-MPI-CL" */;
+			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 0B1F4AA2225BB312004B6293;
-			productRefGroup = 0B1F4AAC225BB312004B6293 /* Products */;
+			mainGroup = 0B295CC4229C0AD0007310BC;
+			productRefGroup = 0B295CCE229C0AD0007310BC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0B1F4AAA225BB312004B6293 /* Matrix Multiplication - OpenMP */,
+				0B295CCC229C0AD0007310BC /* MM-MPI-CL */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		0B295CDC229C0B7D007310BC /* Random Product Name */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Random Product Name";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /usr/local/bin/fish;
+			shellScript = "rm \"/Users/brettbest/Public/SIT315-Repo/Module-3/MM-MPI-CL/MM-MPI-CL/Config.xcconfig\"\ntouch \"/Users/brettbest/Public/SIT315-Repo/Module-3/MM-MPI-CL/MM-MPI-CL/Config.xcconfig\"\necho \"PRODUCT_NAME=MM-MPI-CL-\"(random) >> \"/Users/brettbest/Public/SIT315-Repo/Module-3/MM-MPI-CL/MM-MPI-CL/Config.xcconfig\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
-		0B1F4AA7225BB312004B6293 /* Sources */ = {
+		0B295CC9229C0AD0007310BC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0B1F4AAF225BB312004B6293 /* main.cpp in Sources */,
+				0B295CD1229C0AD0007310BC /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		0B1F4AB0225BB312004B6293 /* Debug */ = {
+		0B295CD2229C0AD0007310BC /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0B295CDD229C0C1C007310BC /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -169,7 +202,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -196,8 +229,9 @@
 			};
 			name = Debug;
 		};
-		0B1F4AB1225BB312004B6293 /* Release */ = {
+		0B295CD3229C0AD0007310BC /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0B295CDD229C0C1C007310BC /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -228,7 +262,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -248,64 +282,56 @@
 			};
 			name = Release;
 		};
-		0B1F4AB3225BB312004B6293 /* Debug */ = {
+		0B295CD5229C0AD0007310BC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CC = /usr/local/opt/llvm/bin/clang;
-				CLANG_ENABLE_MODULES = NO;
-				CODE_SIGN_STYLE = Manual;
-				COMPILER_INDEX_STORE_ENABLE = NO;
-				DEVELOPMENT_TEAM = "";
+				CC = "/usr/local/bin/mpic++";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = THD97639S3;
+				HEADER_SEARCH_PATHS = "/usr/local/Cellar/open-mpi/4.0.1_1/include";
 				LIBRARY_SEARCH_PATHS = (
-					/usr/local/opt/llvm/lib,
-					/usr/local/Cellar/llvm/8.0.0_1/lib,
+					"$(inherited)",
+					"/usr/local/Cellar/open-mpi/4.0.1_1/lib",
 				);
-				OTHER_CFLAGS = "-fopenmp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
-		0B1F4AB4225BB312004B6293 /* Release */ = {
+		0B295CD6229C0AD0007310BC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CC = /usr/local/opt/llvm/bin/clang;
-				CLANG_ENABLE_MODULES = NO;
-				CODE_SIGN_STYLE = Manual;
-				COMPILER_INDEX_STORE_ENABLE = NO;
-				DEVELOPMENT_TEAM = "";
+				CC = "/usr/local/bin/mpic++";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = THD97639S3;
+				HEADER_SEARCH_PATHS = "/usr/local/Cellar/open-mpi/4.0.1_1/include";
 				LIBRARY_SEARCH_PATHS = (
-					/usr/local/opt/llvm/lib,
-					/usr/local/Cellar/llvm/8.0.0_1/lib,
+					"$(inherited)",
+					"/usr/local/Cellar/open-mpi/4.0.1_1/lib",
 				);
-				OTHER_CFLAGS = "-fopenmp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0B1F4AA6225BB312004B6293 /* Build configuration list for PBXProject "Matrix Multiplication - OpenMP" */ = {
+		0B295CC8229C0AD0007310BC /* Build configuration list for PBXProject "MM-MPI-CL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0B1F4AB0225BB312004B6293 /* Debug */,
-				0B1F4AB1225BB312004B6293 /* Release */,
+				0B295CD2229C0AD0007310BC /* Debug */,
+				0B295CD3229C0AD0007310BC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0B1F4AB2225BB312004B6293 /* Build configuration list for PBXNativeTarget "Matrix Multiplication - OpenMP" */ = {
+		0B295CD4229C0AD0007310BC /* Build configuration list for PBXNativeTarget "MM-MPI-CL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0B1F4AB3225BB312004B6293 /* Debug */,
-				0B1F4AB4225BB312004B6293 /* Release */,
+				0B295CD5229C0AD0007310BC /* Debug */,
+				0B295CD6229C0AD0007310BC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 0B1F4AA3225BB312004B6293 /* Project object */;
+	rootObject = 0B295CC5229C0AD0007310BC /* Project object */;
 }
