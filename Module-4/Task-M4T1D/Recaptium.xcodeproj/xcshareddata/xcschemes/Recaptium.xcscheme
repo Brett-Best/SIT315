@@ -88,6 +88,10 @@
             argument = "$(MPI_EXECUTABLE_NAME)"
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "MyARG"
+            isEnabled = "YES">
+         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>

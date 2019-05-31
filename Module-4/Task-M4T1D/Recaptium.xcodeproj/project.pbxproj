@@ -20,12 +20,26 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		0B6AFBBB22A066E700EBF737 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6AFBBA22A066E700EBF737 /* Environment.swift */; };
+		0B6AFBBE22A068CE00EBF737 /* libswiftCreateML.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B6AFBBD22A068CE00EBF737 /* libswiftCreateML.dylib */; };
+		0B6AFBC022A068D400EBF737 /* CoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B6AFBBF22A068D400EBF737 /* CoreML.framework */; };
+		0B6AFBC222A068D800EBF737 /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B6AFBC122A068D800EBF737 /* Vision.framework */; };
+		0B6AFBC422A068DE00EBF737 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B6AFBC322A068DE00EBF737 /* Foundation.framework */; };
+		0BD6898F22A1525300CDA2FE /* WorkAllocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD6898E22A1525300CDA2FE /* WorkAllocator.swift */; };
+		0BD6899122A1647300CDA2FE /* ImageClassifierBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD6899022A1647300CDA2FE /* ImageClassifierBuilder.swift */; };
 		OBJ_23 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* main.swift */; };
 		OBJ_30 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0B6AFBB922A05F0E00EBF737 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		0B6AFBBA22A066E700EBF737 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
+		0B6AFBBD22A068CE00EBF737 /* libswiftCreateML.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswiftCreateML.dylib; path = Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/libswiftCreateML.dylib; sourceTree = DEVELOPER_DIR; };
+		0B6AFBBF22A068D400EBF737 /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
+		0B6AFBC122A068D800EBF737 /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = System/Library/Frameworks/Vision.framework; sourceTree = SDKROOT; };
+		0B6AFBC322A068DE00EBF737 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		0BD6898E22A1525300CDA2FE /* WorkAllocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkAllocator.swift; sourceTree = "<group>"; };
+		0BD6899022A1647300CDA2FE /* ImageClassifierBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageClassifierBuilder.swift; sourceTree = "<group>"; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		OBJ_9 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		"Recaptium::Recaptium::Product" /* Recaptium */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; path = Recaptium; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -36,12 +50,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
+				0B6AFBC422A068DE00EBF737 /* Foundation.framework in Frameworks */,
+				0B6AFBC222A068D800EBF737 /* Vision.framework in Frameworks */,
+				0B6AFBC022A068D400EBF737 /* CoreML.framework in Frameworks */,
+				0B6AFBBE22A068CE00EBF737 /* libswiftCreateML.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0B6AFBBC22A068CE00EBF737 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0B6AFBC322A068DE00EBF737 /* Foundation.framework */,
+				0B6AFBC122A068D800EBF737 /* Vision.framework */,
+				0B6AFBBF22A068D400EBF737 /* CoreML.framework */,
+				0B6AFBBD22A068CE00EBF737 /* libswiftCreateML.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		OBJ_10 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -64,7 +93,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				0B6AFBB922A05F0E00EBF737 /* Config.xcconfig */,
@@ -73,8 +102,8 @@
 				OBJ_10 /* Tests */,
 				OBJ_11 /* Dependencies */,
 				OBJ_12 /* Products */,
+				0B6AFBBC22A068CE00EBF737 /* Frameworks */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -89,6 +118,9 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_9 /* main.swift */,
+				0B6AFBBA22A066E700EBF737 /* Environment.swift */,
+				0BD6898E22A1525300CDA2FE /* WorkAllocator.swift */,
+				0BD6899022A1647300CDA2FE /* ImageClassifierBuilder.swift */,
 			);
 			name = Recaptium;
 			path = Sources/Recaptium;
@@ -145,7 +177,7 @@
 				English,
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_12 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -183,7 +215,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				0BD6899122A1647300CDA2FE /* ImageClassifierBuilder.swift in Sources */,
 				OBJ_23 /* main.swift in Sources */,
+				0BD6898F22A1525300CDA2FE /* WorkAllocator.swift in Sources */,
+				0B6AFBBB22A066E700EBF737 /* Environment.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
