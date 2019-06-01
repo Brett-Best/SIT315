@@ -36,6 +36,8 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      enableASanStackUseAfterReturn = "YES"
+      disableMainThreadChecker = "YES"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
@@ -73,11 +75,11 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-c 5"
+            argument = "-c 2"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--host 10.0.0.1:1,10.0.0.29:1,10.0.0.124:1,10.0.0.75:1,10.0.0.116:1"
+            argument = "--host 10.0.0.1:4"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
@@ -89,7 +91,15 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "MyARG"
+            argument = "--create-models"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--evaluate"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--analyse-images"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

@@ -12,12 +12,20 @@ class Environment {
   let worldRank: Int32
   let processorName: String
   
+  let createModelsEnabled: Bool
+  let evaluationEnabled: Bool
+  let analyseImagesEnabled: Bool
+  
   let argc: Int32
   let argv: [String]
   
   init(argc: Int32, argv: [String]) {
     self.argc = argc
     self.argv = argv
+    
+    createModelsEnabled = argv.contains("--create-models")
+    evaluationEnabled = argv.contains("--evaluate")
+    analyseImagesEnabled = argv.contains("--analyse-images")
     
     var worldSize = Int32()
     MPI_Comm_size(MPI_COMM_WORLD, &worldSize)
