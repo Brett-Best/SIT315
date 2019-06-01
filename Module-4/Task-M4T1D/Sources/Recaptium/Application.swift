@@ -23,19 +23,27 @@ class Application {
     let environment = Environment(argc: CommandLine.argc, argv: CommandLine.arguments)
     environment.printEnvironmentInfo()
     
-    let workAllocator = try WorkAllocator(dataset: "Flowers", environment: environment)
-    try workAllocator.configureFolderStructure()
-    
-    let dispatchSemaphore = DispatchSemaphore(value: 0)
-    
-    workAllocator.build() { _ in
-      dispatchSemaphore.signal()
+    if environment.createModelsEnabled {
+      let mlModelBuilder = try CoreMLModelBuilder(dataset: "Animals", environment: environment)
+      try mlModelBuilder.configureFolderStructure()
+      
+      let dispatchSemaphore = DispatchSemaphore(value: 0)
+      
+      mlModelBuilder.build() { _ in
+        dispatchSemaphore.signal()
+      }
+      
+      dispatchSemaphore.wait()
     }
     
-    dispatchSemaphore.wait()
+    if environment.analyseImagesEnabled {
+      let visionProcessor = VisionProcessor(environment: environment)
+      visionProcessor.compileModels()
+    }
   }
   
   func exit() {
     MPI_Finalize()
   }
 }
+

@@ -45,6 +45,14 @@ class Environment {
     }
     
     self.processorName = processorName
+    
+    validateConfiguration()
+  }
+  
+  func validateConfiguration() {
+    if !createModelsEnabled && evaluationEnabled {
+      fatalError("You must pass '--create-models' when passing '--evaluate'")
+    }
   }
 }
 

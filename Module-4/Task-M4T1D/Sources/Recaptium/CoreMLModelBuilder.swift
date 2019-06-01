@@ -1,5 +1,5 @@
 //
-//  WorkAllocator.swift
+//  CoreMLModelBuilder.swift
 //  Recaptium
 //
 //  Created by Brett Best on 31/5/19.
@@ -8,7 +8,7 @@
 import Foundation
 import CMPI
 
-class WorkAllocator {
+class CoreMLModelBuilder {
   enum Error: Swift.Error {
     case missingMLDataFolder
     case unableToCreateDirectory(at: URL, underlyingError: Swift.Error)
@@ -20,10 +20,12 @@ class WorkAllocator {
   weak var environment: Environment!
   
   let recaptionDatasetFolderName: String
+  let recaptionModelsFolderName: String
   
   init(dataset: String, environment: Environment) throws {
     self.dataset = dataset
     recaptionDatasetFolderName = "Recaptium_" + dataset
+    recaptionModelsFolderName = "Recaptium-Models"
     
     self.environment = environment
     
@@ -36,8 +38,10 @@ class WorkAllocator {
   
   func configureFolderStructure() throws {
     let recaptionDatasetURL = mlDataURL.appendingPathComponent(recaptionDatasetFolderName, isDirectory: true)
+    let recaptionModelsURL = mlDataURL.appendingPathComponent(recaptionModelsFolderName, isDirectory: true)
     
     try createRecaptionRootFolder(url: recaptionDatasetURL)
+    try createModelsFolderIfNeeded(url: recaptionModelsURL)
     
     MPI_Barrier(MPI_COMM_WORLD)
     
@@ -48,6 +52,20 @@ class WorkAllocator {
     if environment.worldRank == 0 {
       if FileManager.default.fileExists(atPath: url.path) {
         try FileManager.default.removeItem(at: url)
+      }
+      
+      do {
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: false)
+      } catch {
+        throw Error.unableToCreateDirectory(at: url, underlyingError: error)
+      }
+    }
+  }
+  
+  func createModelsFolderIfNeeded(url: URL) throws {
+    if environment.worldRank == 0 {
+      if FileManager.default.fileExists(atPath: url.path) {
+        return
       }
       
       do {
@@ -72,6 +90,7 @@ class WorkAllocator {
     }
     
     let operationQueue = OperationQueue()
+    operationQueue.qualityOfService = .userInteractive
     
     let trainingSymlinkOperations = try symlinkDirectoryInDataset(name: "Training", baseURL: trainingURL)
     let validationSymlinkOperations = try symlinkDirectoryInDataset(name: "Validation", baseURL: validationURL)
@@ -79,11 +98,7 @@ class WorkAllocator {
     operationQueue.addOperations(trainingSymlinkOperations, waitUntilFinished: false)
     operationQueue.addOperations(validationSymlinkOperations, waitUntilFinished: false)
     
-    operationQueue.qualityOfService = .userInteractive
-    
     operationQueue.waitUntilAllOperationsAreFinished()
-    
-    MPI_Barrier(MPI_COMM_WORLD)
   }
   
   func symlinkDirectoryInDataset(name: String, baseURL: URL) throws -> [BlockOperation] {
@@ -99,14 +114,14 @@ class WorkAllocator {
     
     let filteredContents = contents.split(into: Int(environment.worldSize))[Int(environment.worldRank)]
     
-    print(filteredContents.count)
-    
     return filteredContents.map { url -> BlockOperation in
       return BlockOperation {
         let linkURL = baseURL.appendingPathComponent(url.lastPathComponent, isDirectory: true)
-//        try! FileManager.default.createSymbolicLink(atPath: linkURL.path, withDestinationPath: url.path)
-//        try! FileManager.default.createSymbolicLink(at: linkURL, withDestinationURL: url)
-//        try! FileManager.default.linkItem(at: url, to: linkURL)
+        do {
+          try FileManager.default.linkItem(at: url, to: linkURL)
+        } catch {
+          print("[ERROR] failed to link item with error: \(error)")
+        }
       }
     }
   }
@@ -116,13 +131,15 @@ class WorkAllocator {
     
     let trainingDataURL = recaptionDatasetURL.appendingPathComponent("\(environment.worldRank)/Training", isDirectory: true)
     let validationDataURL = recaptionDatasetURL.appendingPathComponent("\(environment.worldRank)/Validation", isDirectory: true)
+    let evaluationDataURL = mlDataURL.appendingPathComponent("\(dataset)/evaluation", isDirectory: true)
+    let modelWriteURL = mlDataURL.appendingPathComponent(recaptionModelsFolderName, isDirectory: true).appendingPathComponent("\(dataset)_\(environment.worldRank)_\(environment.worldSize)", isDirectory: false).appendingPathExtension("mlmodel")
 
-    DispatchQueue.global(qos: .userInteractive).async {
+    DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
       do {
-        _ = try ImageClassifierBuilder(trainingDataURL: trainingDataURL, validationDataURL: validationDataURL)
+        _ = try ImageClassifierBuilder(trainingDataURL: trainingDataURL, validationDataURL: validationDataURL, writeURL: modelWriteURL, evaluationURL: self.environment.evaluationEnabled ? evaluationDataURL : nil)
         completion(true)
       } catch {
-        print(error.localizedDescription)
+        print("[ERROR] \(error)")
         completion(false)
       }
     }

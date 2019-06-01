@@ -25,10 +25,11 @@
 		0B6AFBC022A068D400EBF737 /* CoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B6AFBBF22A068D400EBF737 /* CoreML.framework */; };
 		0B6AFBC222A068D800EBF737 /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B6AFBC122A068D800EBF737 /* Vision.framework */; };
 		0B6AFBC422A068DE00EBF737 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B6AFBC322A068DE00EBF737 /* Foundation.framework */; };
-		0BD6898F22A1525300CDA2FE /* WorkAllocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD6898E22A1525300CDA2FE /* WorkAllocator.swift */; };
+		0BD6898F22A1525300CDA2FE /* CoreMLModelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD6898E22A1525300CDA2FE /* CoreMLModelBuilder.swift */; };
 		0BD6899122A1647300CDA2FE /* ImageClassifierBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD6899022A1647300CDA2FE /* ImageClassifierBuilder.swift */; };
 		0BD6899322A19A1600CDA2FE /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD6899222A19A1600CDA2FE /* Application.swift */; };
 		0BD6899522A289F900CDA2FE /* Array+Recaptium.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD6899422A289F900CDA2FE /* Array+Recaptium.swift */; };
+		0BF7667522A3147000AEAD32 /* VisionProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF7667422A3147000AEAD32 /* VisionProcessor.swift */; };
 		OBJ_23 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* main.swift */; };
 		OBJ_30 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
 /* End PBXBuildFile section */
@@ -40,10 +41,11 @@
 		0B6AFBBF22A068D400EBF737 /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
 		0B6AFBC122A068D800EBF737 /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = System/Library/Frameworks/Vision.framework; sourceTree = SDKROOT; };
 		0B6AFBC322A068DE00EBF737 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		0BD6898E22A1525300CDA2FE /* WorkAllocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkAllocator.swift; sourceTree = "<group>"; };
+		0BD6898E22A1525300CDA2FE /* CoreMLModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreMLModelBuilder.swift; sourceTree = "<group>"; };
 		0BD6899022A1647300CDA2FE /* ImageClassifierBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageClassifierBuilder.swift; sourceTree = "<group>"; };
 		0BD6899222A19A1600CDA2FE /* Application.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
 		0BD6899422A289F900CDA2FE /* Array+Recaptium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Recaptium.swift"; sourceTree = "<group>"; };
+		0BF7667422A3147000AEAD32 /* VisionProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionProcessor.swift; sourceTree = "<group>"; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		OBJ_9 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		"Recaptium::Recaptium::Product" /* Recaptium */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; path = Recaptium; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -123,10 +125,11 @@
 			children = (
 				OBJ_9 /* main.swift */,
 				0B6AFBBA22A066E700EBF737 /* Environment.swift */,
-				0BD6898E22A1525300CDA2FE /* WorkAllocator.swift */,
+				0BD6898E22A1525300CDA2FE /* CoreMLModelBuilder.swift */,
 				0BD6899022A1647300CDA2FE /* ImageClassifierBuilder.swift */,
 				0BD6899222A19A1600CDA2FE /* Application.swift */,
 				0BD6899422A289F900CDA2FE /* Array+Recaptium.swift */,
+				0BF7667422A3147000AEAD32 /* VisionProcessor.swift */,
 			);
 			name = Recaptium;
 			path = Sources/Recaptium;
@@ -222,10 +225,11 @@
 			buildActionMask = 0;
 			files = (
 				0BD6899322A19A1600CDA2FE /* Application.swift in Sources */,
+				0BF7667522A3147000AEAD32 /* VisionProcessor.swift in Sources */,
 				0BD6899122A1647300CDA2FE /* ImageClassifierBuilder.swift in Sources */,
 				0BD6899522A289F900CDA2FE /* Array+Recaptium.swift in Sources */,
 				OBJ_23 /* main.swift in Sources */,
-				0BD6898F22A1525300CDA2FE /* WorkAllocator.swift in Sources */,
+				0BD6898F22A1525300CDA2FE /* CoreMLModelBuilder.swift in Sources */,
 				0B6AFBBB22A066E700EBF737 /* Environment.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
