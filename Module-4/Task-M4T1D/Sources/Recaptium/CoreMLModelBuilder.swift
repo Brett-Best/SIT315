@@ -7,6 +7,7 @@
 
 import Foundation
 import CMPI
+import CoreML
 
 class CoreMLModelBuilder {
   enum Error: Swift.Error {
@@ -21,11 +22,13 @@ class CoreMLModelBuilder {
   
   let recaptionDatasetFolderName: String
   let recaptionModelsFolderName: String
+  let recaptionImagessFolderName: String
   
   init(dataset: String, environment: Environment) throws {
     self.dataset = dataset
     recaptionDatasetFolderName = "Recaptium_" + dataset
     recaptionModelsFolderName = "Recaptium-Models"
+    recaptionImagessFolderName = "Recaptium-Images"
     
     self.environment = environment
     
@@ -143,6 +146,49 @@ class CoreMLModelBuilder {
         completion(false)
       }
     }
+  }
+  
+  func compileModels() throws -> [MLModel] {
+    let modelsURL = mlDataURL.appendingPathComponent(recaptionModelsFolderName, isDirectory: true)
+    
+    let modelURLs = try FileManager.default.contentsOfDirectory(at: modelsURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles).filter {
+      $0.pathExtension == "mlmodel"
+    }.sorted {
+      $0.lastPathComponent < $1.lastPathComponent
+    }
+    
+    let operationQueue = OperationQueue()
+    operationQueue.qualityOfService = .userInteractive
+    
+    let filteredContents = modelURLs.split(into: Int(environment.worldSize))[Int(environment.worldRank)]
+    
+    let operations = filteredContents.map { url -> BlockOperation in
+      return BlockOperation {
+        do {
+          let mlmodelcURL = url.deletingPathExtension().appendingPathExtension("mlmodelc")
+          if FileManager.default.fileExists(atPath: mlmodelcURL.path) {
+            try FileManager.default.removeItem(at: mlmodelcURL)
+          }
+          
+          let modelURL = try MLModel.compileModel(at: url)
+          try FileManager.default.moveItem(at: modelURL, to: mlmodelcURL)
+        } catch {
+          print("[ERROR] \(error)")
+        }
+      }
+    }
+    
+    operationQueue.addOperations(operations, waitUntilFinished: true)
+    
+    MPI_Barrier(MPI_COMM_WORLD)
+    
+    let modelcURLs = try FileManager.default.contentsOfDirectory(at: modelsURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles).filter {
+      $0.pathExtension == "mlmodelc"
+    }.sorted {
+      $0.lastPathComponent < $1.lastPathComponent
+    }
+    
+    return try modelcURLs.map { try MLModel(contentsOf: $0) }
   }
   
 }
