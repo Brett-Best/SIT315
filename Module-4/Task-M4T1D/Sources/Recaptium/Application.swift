@@ -12,11 +12,12 @@ class Application {
   
   static let shared = Application()
   
+  var startDate = Date()
+  
   private init() {
     var argc = CommandLine.argc
     var argv: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>? = CommandLine.unsafeArgv
     
-//    MPI_Init(&argc, &argv)
     var provided: Int32 = 0
     MPI_Init_thread(&argc, &argv, Int32(MPI_THREAD_MULTIPLE), &provided)
     if provided != MPI_THREAD_MULTIPLE {
@@ -28,7 +29,9 @@ class Application {
     let environment = Environment(argc: CommandLine.argc, argv: CommandLine.arguments)
     environment.printEnvironmentInfo()
     
-    let mlModelBuilder = try CoreMLModelBuilder(dataset: "Animals", environment: environment)
+    startDate = Date()
+    
+    let mlModelBuilder = try CoreMLModelBuilder(dataset: "fruits-360", environment: environment)
     
     if environment.createModelsEnabled {
       try mlModelBuilder.configureFolderStructure()
@@ -44,11 +47,23 @@ class Application {
     
     MPI_Barrier(MPI_COMM_WORLD)
     
+    if environment.worldRank == 0 {
+      print("[PERF] Building / Evaluating ML Models: \(Date().timeIntervalSince(startDate))s")
+    }
+    
     if environment.analyseImagesEnabled {
+      startDate = Date()
+      
       let models = try mlModelBuilder.compileModels()
       let visionProcessor = try VisionProcessor(environment: environment, models: models)
       
-      visionProcessor.processImages(at: mlModelBuilder.mlDataURL.appendingPathComponent(mlModelBuilder.recaptionImagessFolderName, isDirectory: true)) {}
+      visionProcessor.processImages(at: mlModelBuilder.mlDataURL.appendingPathComponent(mlModelBuilder.recaptionImagessFolderName, isDirectory: true))
+      
+      MPI_Barrier(MPI_COMM_WORLD)
+      
+      if environment.worldRank == 0 {
+        print("[PERF] Analysing images using ML models: \(Date().timeIntervalSince(startDate))")
+      }
     }
   }
   

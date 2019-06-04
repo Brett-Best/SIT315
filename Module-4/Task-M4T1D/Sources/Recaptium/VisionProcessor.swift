@@ -14,12 +14,13 @@ class VisionProcessor {
   let environment: Environment
   
   let vnCoreMlModels: [VNCoreMLModel]
-  let vnCoreMlRequests: [VNCoreMLRequest]
+  var vnCoreMlRequests: [VNCoreMLRequest] = []
   
   let completedRequestsLock = NSLock()
   let operationQueue = OperationQueue()
   
   var completedRequests: UInt = 0
+  var completedRequestsOutput: String = ""
   
   init(environment: Environment, models: [MLModel]) throws {
     self.environment = environment
@@ -33,8 +34,14 @@ class VisionProcessor {
     vnCoreMlRequests = vnCoreMlModels.map {
       let request = VNCoreMLRequest(model: $0) { request, error in
         let classifications = request.results as? [VNClassificationObservation]
-//        print(classifications?.first)
-//        print("[SLAVE \(environment.worldRank)] Processed ML Request")
+        
+        let topClassification = classifications?.filter { observation -> Bool in
+          observation.confidence >= 0.95
+        }.first
+        
+        if let topClassification = topClassification {
+          self.completedRequestsOutput.append("\(topClassification.identifier) (\(Int(topClassification.confidence*100))%), ")
+        }
       }
       
       request.usesCPUOnly = environment.worldRank != 1
@@ -60,7 +67,7 @@ class VisionProcessor {
     }
   }
   
-  func processImages(at url: URL, completion: (() -> Void)) {
+  func processImages(at url: URL) {
     let contents: [URL]
     do {
        contents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles).sorted {
@@ -68,32 +75,17 @@ class VisionProcessor {
       }
     } catch {
       print("[ERROR] \(error)")
-      completion()
       return
     }
     
-    let totalChunks = Int(environment.worldSize) * 20
-    let chunkedContents = contents.split(into: totalChunks)
+    var totalChunks = Int(environment.worldSize-1) * 30 // The GPU is about 30x faster than the CPU.
+    let chunkedContents = contents.split(into: totalChunks, shouldPad: false)
+    totalChunks = chunkedContents.count
     var chunkIndex = environment.worldRank
     
     if environment.worldRank == 0 {
       let nextChunkIndexLock = NSLock()
-      var _nextChunkIndex: Int32 = environment.worldSize
-      
-      var nextChunkIndex: Int32 {
-        get {
-          defer { nextChunkIndexLock.unlock() }
-          nextChunkIndexLock.lock()
-          return _nextChunkIndex
-        }
-        
-        set {
-          nextChunkIndexLock.lock()
-          _nextChunkIndex = newValue < totalChunks ? newValue : -1
-          nextChunkIndexLock.unlock()
-        }
-      }
-      
+      var nextChunkIndex: Int32 = environment.worldSize
     
       let workAllocatorQueue = OperationQueue()
       workAllocatorQueue.qualityOfService = .userInteractive
@@ -101,22 +93,34 @@ class VisionProcessor {
       let operations = (0..<environment.worldSize).map { rank in
         BlockOperation {
           if rank == 0 {
-            
+            // Master node doesn't support running ML at the moment, for separation of concerns I decided against adding in this complexity as it would've required a better abstraction of the threading login + work distribution
           } else {
             var completed: CBool = false
             print("[MASTER] waiting for slave \(rank)")
             MPI_Recv(&completed, 1, MPI_C_BOOL, rank, 0, MPI_COMM_WORLD, nil)
             
-            while nextChunkIndex != -1 {
+            nextChunkIndexLock.lock()
+            var shouldContinueLooping = nextChunkIndex != -1
+            while shouldContinueLooping {
               var chunkIndexToSend = nextChunkIndex
               nextChunkIndex = nextChunkIndex + 1
+              if !(nextChunkIndex < totalChunks) {
+                nextChunkIndex = -1
+                print("[MASTER] Next Chunk is -1")
+              }
+              nextChunkIndexLock.unlock()
+              
               print("[MASTER] Sent \(chunkIndex) to \(rank)")
               MPI_Send(&chunkIndexToSend, 1, MPI_INT32_T, rank, 0, MPI_COMM_WORLD)
               
               var completed: CBool = false
               print("[MASTER] waiting for slave \(rank)")
               MPI_Recv(&completed, 1, MPI_C_BOOL, rank, 0, MPI_COMM_WORLD, nil)
+              
+              nextChunkIndexLock.lock()
+              shouldContinueLooping = nextChunkIndex != -1
             }
+            nextChunkIndexLock.unlock()
             
             print("[MASTER] COMPLETED \(rank)")
             var completedInt: Int32 = -1
@@ -129,26 +133,33 @@ class VisionProcessor {
       print("[MASTER] All Operations Completed")
     } else {
       while chunkIndex != -1 {
-        print("[SLAVE \(environment.worldRank)] Processing index: \(chunkIndex) \(chunkIndex == -1)")
+        print("[SLAVE \(environment.worldRank)] Processing index: \(chunkIndex)")
         var completed: CBool = true
         let dispatchSemaphore = DispatchSemaphore(value: 0)
         
         let imageURLsToProcess = chunkedContents[Int(chunkIndex)]
         let totalImagesToProcess = imageURLsToProcess.count
         imageURLsToProcess.forEach {
+          completedRequestsOutput = "[ClASSIFICATION] \($0.lastPathComponent): "
           processImage(at: $0) { [unowned self] completedRequests in
             print("[SLAVE \(self.environment.worldRank)] Image Processed \(completedRequests) of \(totalImagesToProcess)")
             if totalImagesToProcess == completedRequests {
               print("[SLAVE \(self.environment.worldRank)] ALL Images Processed")
               self.completedRequests = 0
+              print(self.completedRequestsOutput)
+              self.completedRequestsOutput = ""
               dispatchSemaphore.signal()
             }
           }
         }
         
-        dispatchSemaphore.wait()
+        if !imageURLsToProcess.isEmpty {
+          dispatchSemaphore.wait()
+        } else {
+          assertionFailure("This should never get hit, however, if it does the chunking of work has an error in it.")
+        }
         
-        print("[SLAVE \(environment.worldRank)] Request next chunk")
+        print("[SLAVE \(environment.worldRank)] Request next chunk, completed chunk \(chunkIndex)")
         
         MPI_Send(&completed, 1, MPI_C_BOOL, 0, 0, MPI_COMM_WORLD)
         print("[SLAVE \(environment.worldRank)] Sent to master")

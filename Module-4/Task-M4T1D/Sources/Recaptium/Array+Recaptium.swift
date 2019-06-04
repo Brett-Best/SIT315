@@ -9,9 +9,9 @@ import Foundation
 
 extension Array {
   
-  func split(into chunks: Int) -> [[Element]] {
+  func split(into chunks: Int, shouldPad: Bool = true) -> [[Element]] {
     var chunkedArray = chunked(into: Int(ceil(Double(count)/Double(chunks))))
-    if chunkedArray.count != chunks {
+    if chunkedArray.count != chunks && shouldPad {
       chunkedArray.append(contentsOf: [[Element]](repeating: [], count: chunks-chunkedArray.count))
     }
     return chunkedArray

@@ -91,7 +91,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--create-models"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--evaluate"
